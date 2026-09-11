@@ -1,0 +1,4990 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>COUP Online</title>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    width: 100%;
+    height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #18181b 0%,
+            #09090b 50%,
+            #050506 100%
+        );
+
+    color: white;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    padding: 12px;
+
+    overflow: hidden;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    border: 0;
+
+    border-radius: 8px;
+
+    padding: 10px 13px;
+
+    font-weight: 800;
+
+    background: #ef4444;
+
+    color: white;
+
+    cursor: pointer;
+
+    transition:
+        transform .15s ease,
+        filter .15s ease;
+}
+
+button:hover:not(:disabled) {
+    filter: brightness(1.1);
+
+    transform:
+        translateY(-1px);
+}
+
+button.blue {
+    background: #3b82f6;
+}
+
+button.green {
+    background: #10b981;
+}
+
+button.gray {
+    background: #52525b;
+}
+
+button:disabled {
+    opacity: .42;
+
+    cursor: default;
+
+    transform: none;
+}
+
+input {
+    width: 100%;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    border:
+        1px solid
+        #3f3f46;
+
+    background:
+        #27272a;
+
+    color: white;
+
+    margin:
+        6px 0 10px;
+}
+
+.screen {
+    max-width: 850px;
+
+    margin: auto;
+}
+
+.panel {
+    background:
+        rgba(
+            24,
+            24,
+            27,
+            .96
+        );
+
+    border:
+        1px solid
+        #303036;
+
+    border-radius: 14px;
+
+    padding: 14px;
+
+    box-shadow:
+        0 8px 24px
+        rgba(
+            0,
+            0,
+            0,
+            .2
+        );
+}
+
+h1,
+h2,
+h3,
+p {
+    margin-top: 0;
+}
+
+.red {
+    color: #ef4444;
+}
+
+.muted {
+    color: #a1a1aa;
+}
+
+.row {
+    display: flex;
+
+    gap: 8px;
+
+    flex-wrap: wrap;
+}
+
+.row button {
+    flex: 1;
+
+    min-width: 120px;
+}
+
+
+/* ================================================= */
+/* 로비 */
+/* ================================================= */
+
+#lobby {
+    max-width: 500px;
+}
+
+#lobby .panel {
+    margin-bottom: 12px;
+}
+
+.room {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 10px 0;
+
+    border-bottom:
+        1px solid
+        #34343a;
+}
+
+.room:last-child {
+    border-bottom: 0;
+}
+
+
+/* ================================================= */
+/* 대기실 */
+/* ================================================= */
+
+#wait-room {
+    display: none;
+
+    max-width: 500px;
+}
+
+#waiting-list {
+    padding-left: 22px;
+
+    line-height: 1.8;
+}
+
+
+/* ================================================= */
+/* 게임 전체 */
+/* ================================================= */
+
+#game-screen {
+    width: min(
+        1500px,
+        100%
+    );
+
+    height:
+        calc(
+            100vh - 24px
+        );
+
+    margin: 0 auto;
+
+    display: none;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        300px;
+
+    grid-template-rows:
+        92px
+        minmax(0, 1fr)
+        270px;
+
+    grid-template-areas:
+        "status history"
+        "table history"
+        "controls history";
+
+    gap: 10px;
+
+    overflow: hidden;
+}
+
+
+/* ================================================= */
+/* 상단 상태 */
+/* ================================================= */
+
+.game-status {
+    grid-area: status;
+
+    min-height: 0;
+}
+
+.status-main {
+    height: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr auto;
+
+    align-items: center;
+
+    gap: 20px;
+}
+
+#log-msg {
+    min-width: 0;
+
+    text-align: center;
+
+    font-size: 18px;
+
+    font-weight: 900;
+
+    line-height: 1.4;
+}
+
+.board-center {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+#deck-pile {
+    width: 54px;
+    height: 72px;
+
+    flex-shrink: 0;
+
+    border:
+        2px solid
+        #71717a;
+
+    border-radius: 8px;
+
+    background:
+        repeating-linear-gradient(
+            45deg,
+            #18181b,
+            #18181b 8px,
+            #3f3f46 8px,
+            #3f3f46 16px
+        );
+
+    color: #d4af37;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 10px;
+
+    font-weight: 900;
+
+    box-shadow:
+        3px 3px 0 #27272a,
+        6px 6px 0 #18181b;
+}
+
+#bank {
+    white-space: nowrap;
+
+    padding:
+        10px 12px;
+
+    border-radius: 999px;
+
+    background: #27272a;
+
+    border:
+        1px solid
+        #52525b;
+
+    font-weight: 900;
+}
+
+
+/* ================================================= */
+/* 상대 영역 */
+/* ================================================= */
+
+.game-table {
+    grid-area: table;
+
+    min-height: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+.section-label {
+    color: #a1a1aa;
+
+    font-size: 12px;
+
+    font-weight: 900;
+
+    margin-bottom: 8px;
+
+    letter-spacing: .5px;
+}
+
+#opponents {
+    flex: 1;
+
+    min-height: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap: 8px;
+
+    overflow-y: auto;
+
+    align-content: start;
+}
+
+
+/* ================================================= */
+/* 플레이어 */
+/* ================================================= */
+
+.player {
+    background:
+        #111114;
+
+    border:
+        1px solid
+        #303036;
+
+    border-radius: 12px;
+
+    padding: 10px;
+
+    position: relative;
+
+    transition:
+        border .2s ease,
+        box-shadow .2s ease;
+}
+
+.player.turn {
+    border-color: #10b981;
+
+    box-shadow:
+        0 0 18px
+        rgba(
+            16,
+            185,
+            129,
+            .22
+        );
+}
+
+.opponent-player {
+    margin: 0;
+}
+
+.head {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    font-weight: 900;
+
+    margin-bottom: 8px;
+}
+
+.cards {
+    display: flex;
+
+    gap: 8px;
+
+    flex-wrap: wrap;
+
+    align-items: flex-start;
+}
+
+
+/* ================================================= */
+/* 카드 */
+/* ================================================= */
+
+.card {
+    width: 118px;
+
+    aspect-ratio:
+        2 / 3;
+
+    position: relative;
+
+    border-radius: 10px;
+
+    flex-shrink: 0;
+
+    transform-origin: center;
+
+    transition:
+        transform .22s ease,
+        filter .22s ease,
+        box-shadow .22s ease;
+
+    cursor: pointer;
+
+    overflow: visible;
+}
+
+.opponent-player .card {
+    width: 83px;
+}
+
+.card.image-card {
+    background: #111114;
+
+    border:
+        1px solid
+        #52525b;
+
+    box-shadow:
+        0 5px 14px
+        rgba(
+            0,
+            0,
+            0,
+            .45
+        );
+}
+
+.card.image-card img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    border-radius: 9px;
+}
+
+.card.image-card:not(.dead):hover {
+    transform:
+        translateY(-8px)
+        scale(1.1);
+
+    z-index: 50;
+
+    filter:
+        brightness(1.08);
+
+    box-shadow:
+        0 18px 35px
+        rgba(
+            0,
+            0,
+            0,
+            .65
+        );
+}
+
+
+/* ================================================= */
+/* 카드 툴팁 */
+/* ================================================= */
+
+.card[data-tooltip]::after {
+    content:
+        attr(
+            data-tooltip
+        );
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom:
+        calc(
+            100% + 10px
+        );
+
+    transform:
+        translateX(-50%)
+        translateY(5px);
+
+    width: 240px;
+
+    padding:
+        10px 12px;
+
+    background:
+        rgba(
+            9,
+            9,
+            11,
+            .98
+        );
+
+    border:
+        1px solid
+        #52525b;
+
+    border-radius: 9px;
+
+    color: white;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    line-height: 1.5;
+
+    text-align: center;
+
+    box-shadow:
+        0 8px 25px
+        rgba(
+            0,
+            0,
+            0,
+            .65
+        );
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition:
+        opacity .18s ease,
+        transform .18s ease;
+
+    z-index: 100;
+}
+
+.card[data-tooltip]:hover::after {
+    opacity: 1;
+
+    visibility: visible;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+
+/* ================================================= */
+/* 비공개 카드 */
+/* ================================================= */
+
+.card.hidden {
+    overflow: hidden;
+
+    border:
+        2px solid
+        #52525b;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #27272a 0%,
+            #18181b 60%,
+            #09090b 100%
+        );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    box-shadow:
+        0 5px 14px
+        rgba(
+            0,
+            0,
+            0,
+            .45
+        );
+}
+
+.card.hidden::before {
+    content: "COUP";
+
+    color: #d4af37;
+
+    border:
+        1px solid
+        #d4af37;
+
+    padding:
+        7px 5px;
+
+    border-radius: 5px;
+
+    font-size: 13px;
+
+    font-weight: 900;
+
+    letter-spacing: 2px;
+}
+
+
+/* ================================================= */
+/* 죽은 카드 */
+/* ================================================= */
+
+.card.dead {
+    filter:
+        grayscale(.85)
+        brightness(.38);
+
+    opacity: .78;
+
+    cursor: default;
+}
+
+.card.dead:hover {
+    transform: none;
+}
+
+.card.dead::before {
+    content:
+        "✕ 공개됨";
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%)
+        rotate(-12deg);
+
+    z-index: 10;
+
+    padding:
+        5px 7px;
+
+    border:
+        2px solid
+        #ef4444;
+
+    border-radius: 5px;
+
+    color: #fecaca;
+
+    background:
+        rgba(
+            127,
+            29,
+            29,
+            .9
+        );
+
+    font-size: 11px;
+
+    font-weight: 900;
+
+    white-space: nowrap;
+}
+
+
+/* ================================================= */
+/* 하단 내 영역 + 행동 */
+/* ================================================= */
+
+.game-controls {
+    grid-area: controls;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(
+            300px,
+            .85fr
+        )
+        minmax(
+            380px,
+            1.15fr
+        );
+
+    gap: 10px;
+
+    min-height: 0;
+}
+
+.my-panel,
+.control-panel {
+    min-height: 0;
+
+    overflow: hidden;
+}
+
+.my-panel {
+    overflow: visible;
+}
+
+.control-panel {
+    overflow-y: auto;
+}
+
+
+/* ================================================= */
+/* 행동 */
+/* ================================================= */
+
+.action-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap: 7px;
+}
+
+.action-grid button {
+    width: 100%;
+
+    min-height: 62px;
+
+    padding:
+        8px 6px;
+
+    font-size: 12px;
+
+    line-height: 1.35;
+}
+
+
+/* ================================================= */
+/* 대상 선택 */
+/* ================================================= */
+
+#target-area {
+    min-height: 0;
+}
+
+.target-list {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap: 8px;
+}
+
+.target-list button {
+    min-width: 0;
+}
+
+
+/* ================================================= */
+/* 도전 */
+/* ================================================= */
+
+.challenge-box {
+    border:
+        1px solid
+        #ef4444;
+
+    background:
+        rgba(
+            127,
+            29,
+            29,
+            .16
+        );
+
+    border-radius: 12px;
+
+    padding: 12px;
+}
+
+.challenge-timer {
+    font-size: 21px;
+
+    font-weight: 900;
+
+    color: #fbbf24;
+
+    margin-bottom: 8px;
+}
+
+.timer-bar {
+    width: 100%;
+    height: 6px;
+
+    background: #27272a;
+
+    border-radius: 999px;
+
+    overflow: hidden;
+
+    margin-bottom: 10px;
+}
+
+.timer-fill {
+    width: 100%;
+    height: 100%;
+
+    background: #ef4444;
+
+    transform-origin: left;
+}
+
+
+/* ================================================= */
+/* 방어 */
+/* ================================================= */
+
+.defense-box {
+    border:
+        1px solid
+        #3b82f6;
+
+    background:
+        rgba(
+            30,
+            64,
+            175,
+            .14
+        );
+
+    border-radius: 12px;
+
+    padding: 12px;
+}
+
+.defense-box .timer-fill {
+    background: #3b82f6;
+}
+
+
+/* ================================================= */
+/* 외교관 교환 */
+/* ================================================= */
+
+.exchange-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap: 8px;
+}
+
+.exchange-choice {
+    background: #111114;
+
+    border:
+        2px solid
+        #3f3f46;
+
+    border-radius: 9px;
+
+    padding: 5px;
+
+    transition:
+        .18s ease;
+}
+
+.exchange-choice img {
+    width: 100%;
+
+    max-height: 125px;
+
+    object-fit: contain;
+
+    border-radius: 6px;
+
+    display: block;
+}
+
+.exchange-choice span {
+    display: block;
+
+    margin-top: 5px;
+
+    font-size: 11px;
+
+    font-weight: 900;
+}
+
+.exchange-choice:hover {
+    border-color: #06b6d4;
+
+    transform:
+        translateY(-3px);
+}
+
+.exchange-choice.selected {
+    border-color: #22c55e;
+
+    box-shadow:
+        0 0 15px
+        rgba(
+            34,
+            197,
+            94,
+            .5
+        );
+
+    transform:
+        translateY(-3px)
+        scale(1.02);
+}
+
+
+/* ================================================= */
+/* 로그 */
+/* ================================================= */
+
+.history-panel {
+    grid-area: history;
+
+    min-height: 0;
+
+    overflow: hidden;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+.history-list {
+    flex: 1;
+
+    min-height: 0;
+
+    overflow-y: auto;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.history-item {
+    background: #111114;
+
+    border-left:
+        3px solid
+        #52525b;
+
+    border-radius: 6px;
+
+    padding:
+        7px 8px;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+}
+
+.history-item.challenge {
+    border-left-color: #ef4444;
+}
+
+.history-item.result {
+    border-left-color: #10b981;
+}
+
+.history-item.coin {
+    border-left-color: #f59e0b;
+}
+
+.history-item.loss {
+    border-left-color: #f97316;
+}
+
+.history-item.turn {
+    border-left-color: #3b82f6;
+}
+
+.history-item.block {
+    border-left-color: #60a5fa;
+}
+
+.history-time {
+    color: #71717a;
+
+    font-size: 10px;
+
+    margin-right: 5px;
+}
+
+
+/* ================================================= */
+/* 코인 애니메이션 */
+/* ================================================= */
+
+.coin-fx {
+    position: fixed;
+
+    z-index: 9999;
+
+    pointer-events: none;
+
+    font-size: 25px;
+
+    filter:
+        drop-shadow(
+            0 3px 4px
+            rgba(
+                0,
+                0,
+                0,
+                .45
+            )
+        );
+}
+
+.amount-fx {
+    position: fixed;
+
+    z-index: 9998;
+
+    pointer-events: none;
+
+    font-size: 20px;
+
+    font-weight: 900;
+
+    color: #fbbf24;
+
+    text-shadow:
+        0 2px 6px
+        black;
+}
+
+
+/* ================================================= */
+/* 도전 / 사망 시네마틱 */
+/* ================================================= */
+
+.cinematic-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 10000;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            .86
+        );
+
+    backdrop-filter:
+        blur(6px);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition:
+        opacity .22s ease;
+}
+
+.cinematic-overlay.show {
+    opacity: 1;
+
+    visibility: visible;
+}
+
+.cinematic-content {
+    width:
+        min(
+            570px,
+            calc(
+                100vw - 30px
+            )
+        );
+
+    text-align: center;
+
+    transform:
+        scale(.82);
+
+    opacity: 0;
+
+    transition:
+        transform .28s ease,
+        opacity .28s ease;
+}
+
+.cinematic-overlay.show
+.cinematic-content {
+    transform: scale(1);
+
+    opacity: 1;
+}
+
+.cinematic-title {
+    font-size: 38px;
+
+    font-weight: 1000;
+
+    margin-bottom: 14px;
+
+    letter-spacing: 2px;
+}
+
+.cinematic-subtitle {
+    font-size: 17px;
+
+    line-height: 1.5;
+
+    color: #d4d4d8;
+
+    margin-bottom: 17px;
+}
+
+.cinematic-card {
+    width: 190px;
+
+    aspect-ratio:
+        2 / 3;
+
+    margin:
+        0 auto 17px;
+
+    border-radius: 13px;
+
+    overflow: hidden;
+
+    position: relative;
+
+    box-shadow:
+        0 18px 55px
+        rgba(
+            0,
+            0,
+            0,
+            .8
+        );
+
+    animation:
+        cinematicCardIn
+        .55s
+        cubic-bezier(
+            .2,
+            .85,
+            .25,
+            1
+        );
+}
+
+.cinematic-card img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.cinematic-card.false {
+    filter:
+        grayscale(.8)
+        brightness(.55);
+}
+
+.cinematic-card.false::after {
+    content: "거짓";
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #ef4444;
+
+    font-size: 45px;
+
+    font-weight: 1000;
+
+    text-shadow:
+        0 3px 8px
+        black;
+
+    transform:
+        rotate(-12deg);
+}
+
+.cinematic-result {
+    font-size: 29px;
+
+    font-weight: 1000;
+}
+
+.cinematic-result.success {
+    color: #22c55e;
+}
+
+.cinematic-result.fail {
+    color: #ef4444;
+}
+
+.cinematic-card.death {
+    animation:
+        deathCard
+        1.15s
+        ease
+        forwards;
+}
+
+.death-title {
+    color: #ef4444;
+
+    animation:
+        deathText
+        .7s
+        ease;
+}
+
+.eliminated-title {
+    color: #dc2626;
+
+    font-size: 40px;
+
+    font-weight: 1000;
+
+    margin-top: 14px;
+
+    animation:
+        deathText
+        .7s
+        ease;
+}
+
+.cinematic-overlay.red-flash::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        rgba(
+            220,
+            38,
+            38,
+            .25
+        );
+
+    animation:
+        redFlash
+        .45s
+        ease;
+}
+
+
+/* ================================================= */
+/* 시네마틱 애니메이션 */
+/* ================================================= */
+
+@keyframes cinematicCardIn {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(65px)
+            rotateY(80deg)
+            scale(.72);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            rotateY(0)
+            scale(1);
+    }
+}
+
+
+@keyframes deathCard {
+
+    0% {
+        transform:
+            scale(1)
+            rotate(0);
+
+        filter:
+            brightness(1);
+    }
+
+    20% {
+        transform:
+            translateX(-9px)
+            rotate(-4deg);
+    }
+
+    35% {
+        transform:
+            translateX(9px)
+            rotate(4deg);
+    }
+
+    50% {
+        transform:
+            translateX(-7px)
+            rotate(-3deg);
+    }
+
+    65% {
+        transform:
+            translateX(5px)
+            rotate(2deg);
+    }
+
+    100% {
+        transform:
+            scale(.88)
+            rotate(-8deg);
+
+        filter:
+            grayscale(1)
+            brightness(.32);
+
+        opacity: .55;
+    }
+}
+
+
+@keyframes deathText {
+
+    from {
+        transform:
+            scale(2.2);
+
+        opacity: 0;
+    }
+
+    to {
+        transform:
+            scale(1);
+
+        opacity: 1;
+    }
+}
+
+
+@keyframes redFlash {
+
+    0% {
+        opacity: 0;
+    }
+
+    35% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+
+/* ================================================= */
+/* 작은 화면 */
+/* ================================================= */
+
+@media (
+    max-width: 1000px
+) {
+
+    body {
+        height: auto;
+
+        min-height: 100vh;
+
+        overflow: auto;
+    }
+
+    #game-screen {
+        height: auto;
+
+        grid-template-columns:
+            1fr;
+
+        grid-template-rows:
+            auto;
+
+        grid-template-areas:
+            "status"
+            "table"
+            "controls"
+            "history";
+
+        overflow: visible;
+    }
+
+    .game-controls {
+        grid-template-columns:
+            1fr;
+
+        min-height: 0;
+    }
+
+    .history-panel {
+        min-height: 250px;
+    }
+
+    #opponents {
+        overflow: visible;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================================================= -->
+<!-- 로비 -->
+<!-- ================================================= -->
+
+<div
+    id="lobby"
+    class="screen"
+>
+
+    <div class="panel">
+
+        <h1 class="red">
+            COUP Online
+        </h1>
+
+        <input
+            id="nickname"
+            placeholder="닉네임 입력"
+        >
+
+        <button
+            style="width:100%"
+            onclick="createRoom()"
+        >
+            새 방 만들기
+        </button>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h3>
+            공개 방
+        </h3>
+
+        <div
+            id="room-list"
+            class="muted"
+        >
+            현재 방이 없습니다.
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h3>
+            코드로 참가
+        </h3>
+
+        <input
+            id="room-code"
+            maxlength="4"
+            placeholder="방 코드 입력"
+        >
+
+        <button
+            class="blue"
+            style="width:100%"
+            onclick="joinByCode()"
+        >
+            입장
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- 대기실 -->
+<!-- ================================================= -->
+
+<div
+    id="wait-room"
+    class="screen"
+>
+
+    <div class="panel">
+
+        <h2>
+            대기실
+        </h2>
+
+        <p>
+
+            방 코드:
+
+            <b
+                id="code-label"
+                class="red"
+            ></b>
+
+        </p>
+
+        <ul
+            id="waiting-list"
+        ></ul>
+
+        <div class="row">
+
+            <button
+                class="green"
+                onclick="addAI()"
+            >
+                🤖 AI 추가
+            </button>
+
+            <button
+                onclick="startGame()"
+            >
+                ⚔️ 게임 시작
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- 게임 -->
+<!-- ================================================= -->
+
+<div id="game-screen">
+
+    <!-- 상단 -->
+    <div
+        class="
+            game-status
+            panel
+        "
+    >
+
+        <div class="status-main">
+
+            <div id="log-msg">
+                게임 준비 중...
+            </div>
+
+            <div class="board-center">
+
+                <div id="deck-pile">
+                    COUP
+                </div>
+
+                <div id="bank">
+                    🪙 BANK
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- 상대 -->
+    <div
+        class="
+            game-table
+            panel
+        "
+    >
+
+        <div class="section-label">
+            상대 플레이어
+        </div>
+
+        <div id="opponents"></div>
+
+    </div>
+
+
+    <!-- 내 카드 + 조작 -->
+    <div class="game-controls">
+
+        <div
+            class="
+                my-panel
+                panel
+            "
+        >
+
+            <div class="section-label">
+                나
+            </div>
+
+            <div id="me"></div>
+
+        </div>
+
+
+        <div
+            class="
+                control-panel
+                panel
+            "
+        >
+
+            <div class="section-label">
+                행동 / 현재 상황
+            </div>
+
+
+            <div
+                id="action-area"
+                style="display:none"
+            >
+
+                <div class="action-grid">
+
+                    <button
+                        class="gray"
+                        onclick="chooseAction('income')"
+                    >
+                        소득
+                        <br>
+                        +1
+                    </button>
+
+                    <button
+                        class="blue"
+                        onclick="chooseAction('foreignAid')"
+                    >
+                        외부 지원
+                        <br>
+                        +2
+                    </button>
+
+                    <button
+                        onclick="chooseAction('coup')"
+                    >
+                        쿠데타
+                        <br>
+                        -7
+                    </button>
+
+                    <button
+                        onclick="chooseAction('tax')"
+                    >
+                        공작
+                        <br>
+                        세금 +3
+                    </button>
+
+                    <button
+                        onclick="chooseAction('assassinate')"
+                    >
+                        암살자
+                        <br>
+                        암살 -3
+                    </button>
+
+                    <button
+                        onclick="chooseAction('steal')"
+                    >
+                        사령관
+                        <br>
+                        약탈
+                    </button>
+
+                    <button
+                        class="green"
+                        onclick="chooseAction('exchange')"
+                    >
+                        외교관
+                        <br>
+                        카드 교환
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="target-area"
+                style="display:none"
+            ></div>
+
+
+            <div
+                id="prompt-area"
+                style="display:none"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- 로그 -->
+    <div
+        class="
+            history-panel
+            panel
+        "
+    >
+
+        <div class="section-label">
+            📜 행동 기록
+        </div>
+
+        <div
+            id="history-list"
+            class="
+                history-list
+                muted
+            "
+        >
+            아직 기록이 없습니다.
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- 연출창 -->
+<!-- ================================================= -->
+
+<div
+    id="cinematic-overlay"
+    class="cinematic-overlay"
+>
+
+    <div
+        id="cinematic-content"
+        class="cinematic-content"
+    ></div>
+
+</div>
+
+
+<script>
+
+
+const socket =
+    io();
+
+
+// =====================================================
+// 카드 이미지
+// =====================================================
+
+const ROLE_IMAGES = {
+
+    '공작':
+        '/cards/duke.png',
+
+    '암살자':
+        '/cards/assassin.png',
+
+    '사령관':
+        '/cards/captain.png',
+
+    '외교관':
+        '/cards/ambassador.png',
+
+    '귀부인':
+        '/cards/contessa.png'
+};
+
+
+// =====================================================
+// 카드 설명
+// =====================================================
+
+const ROLE_TOOLTIPS = {
+
+    '공작':
+        '공작 · 세금 징수로 코인 3개 획득 · 다른 플레이어의 외부 지원을 차단할 수 있습니다.',
+
+    '암살자':
+        '암살자 · 코인 3개를 지불하고 상대의 영향력 1개를 제거합니다.',
+
+    '사령관':
+        '사령관 · 상대에게서 최대 2코인을 약탈 · 사령관의 약탈을 방어할 수 있습니다.',
+
+    '외교관':
+        '외교관 · 덱에서 새 카드 2장을 보고 원하는 카드로 교환 · 사령관의 약탈을 방어할 수 있습니다.',
+
+    '귀부인':
+        '귀부인 · 암살자의 암살을 차단할 수 있습니다.'
+};
+
+
+let currentRoom =
+    '';
+
+
+let state =
+    null;
+
+
+let targetAction =
+    null;
+
+
+let challengeInterval =
+    null;
+
+
+let exchangeSelection =
+    new Set();
+
+
+let hasPlayedDealAnimation =
+    false;
+
+
+let visualQueue =
+    [];
+
+
+let visualPlaying =
+    false;
+
+
+const TARGET_ACTIONS =
+    new Set([
+        'coup',
+        'assassinate',
+        'steal'
+    ]);
+
+
+// =====================================================
+// 화면 전환
+// =====================================================
+
+function show(name) {
+
+    document
+        .getElementById(
+            'lobby'
+        )
+        .style
+        .display =
+
+            name ===
+            'lobby'
+
+                ? 'block'
+
+                : 'none';
+
+
+    document
+        .getElementById(
+            'wait-room'
+        )
+        .style
+        .display =
+
+            name ===
+            'wait-room'
+
+                ? 'block'
+
+                : 'none';
+
+
+    document
+        .getElementById(
+            'game-screen'
+        )
+        .style
+        .display =
+
+            name ===
+            'game-screen'
+
+                ? 'grid'
+
+                : 'none';
+}
+
+
+// =====================================================
+// 닉네임 / 방
+// =====================================================
+
+function nick() {
+
+    return (
+
+        document
+            .getElementById(
+                'nickname'
+            )
+            .value
+            .trim()
+
+        ||
+
+        '익명'
+    );
+}
+
+
+function createRoom() {
+
+    socket.emit(
+        'create_room',
+        nick()
+    );
+}
+
+
+function joinRoom(code) {
+
+    currentRoom =
+
+        String(
+            code || ''
+        )
+            .trim()
+            .toUpperCase();
+
+
+    socket.emit(
+
+        'join_room',
+
+        {
+
+            roomCode:
+                currentRoom,
+
+            nickname:
+                nick()
+        }
+    );
+}
+
+
+function joinByCode() {
+
+    joinRoom(
+
+        document
+            .getElementById(
+                'room-code'
+            )
+            .value
+    );
+}
+
+
+function addAI() {
+
+    socket.emit(
+        'add_ai',
+        currentRoom
+    );
+}
+
+
+function startGame() {
+
+    socket.emit(
+        'start_game',
+        currentRoom
+    );
+}
+
+
+// =====================================================
+// Socket
+// =====================================================
+
+socket.on(
+
+    'connect',
+
+    () => {
+
+        socket.emit(
+            'request_lobby'
+        );
+    }
+);
+
+
+socket.on(
+
+    'error_msg',
+
+    message => {
+
+        alert(
+            message
+        );
+    }
+);
+
+
+socket.on(
+
+    'log_msg',
+
+    message => {
+
+        const element =
+
+            document
+                .getElementById(
+                    'log-msg'
+                );
+
+
+        if (
+            element
+        ) {
+
+            element.textContent =
+                message;
+        }
+    }
+);
+
+
+// =====================================================
+// 시각 연출 이벤트
+// =====================================================
+
+socket.on(
+
+    'visual_event',
+
+    event => {
+
+        visualQueue.push(
+            event
+        );
+
+
+        runVisualQueue();
+    }
+);
+
+
+// =====================================================
+// 로비 업데이트
+// =====================================================
+
+socket.on(
+
+    'lobby_update',
+
+    rooms => {
+
+        const box =
+
+            document
+                .getElementById(
+                    'room-list'
+                );
+
+
+        const entries =
+
+            Object.entries(
+                rooms
+            );
+
+
+        if (
+            !entries.length
+        ) {
+
+            box.innerHTML =
+                '현재 공개된 방이 없습니다.';
+
+            return;
+        }
+
+
+        box.innerHTML =
+
+            entries
+
+                .map(
+
+                    ([code, room]) => {
+
+                        const full =
+                            room.players.length >= 5;
+
+
+                        const disabled =
+                            room.isPlaying || full;
+
+
+                        let status =
+                            '대기중';
+
+
+                        if (
+                            room.isPlaying
+                        ) {
+
+                            status =
+                                '게임중';
+                        }
+
+                        else if (
+                            full
+                        ) {
+
+                            status =
+                                '가득 참';
+                        }
+
+
+                        return `
+
+                            <div class="room">
+
+                                <div>
+
+                                    <b>
+                                        [${code}]
+                                    </b>
+
+                                    <br>
+
+                                    <span class="muted">
+
+                                        ${room.players.length}/5
+                                        ·
+                                        ${status}
+
+                                    </span>
+
+                                </div>
+
+                                <button
+
+                                    class="blue"
+
+                                    ${
+                                        disabled
+                                            ? 'disabled'
+                                            : ''
+                                    }
+
+                                    onclick="
+                                        joinRoom(
+                                            '${code}'
+                                        )
+                                    "
+                                >
+                                    참가
+                                </button>
+
+                            </div>
+                        `;
+                    }
+                )
+
+                .join('');
+    }
+);
+
+
+// =====================================================
+// 대기실
+// =====================================================
+
+socket.on(
+
+    'room_created',
+
+    data => {
+
+        currentRoom =
+            data.roomCode;
+
+
+        renderWaiting(
+            data
+        );
+    }
+);
+
+
+socket.on(
+
+    'room_updated',
+
+    data => {
+
+        currentRoom =
+            data.roomCode;
+
+
+        renderWaiting(
+            data
+        );
+    }
+);
+
+
+function renderWaiting(
+    data
+) {
+
+    show(
+        'wait-room'
+    );
+
+
+    document
+        .getElementById(
+            'code-label'
+        )
+        .textContent =
+            data.roomCode;
+
+
+    document
+        .getElementById(
+            'waiting-list'
+        )
+        .innerHTML =
+
+            data.players
+
+                .map(
+
+                    player => `
+
+                        <li>
+
+                            ${escapeHtml(
+                                player.name
+                            )}
+
+                            ${
+                                player.isAI
+                                    ? ' 🤖'
+                                    : ''
+                            }
+
+                        </li>
+                    `
+                )
+
+                .join('');
+}
+
+
+// =====================================================
+// 게임 상태
+// =====================================================
+
+socket.on(
+
+    'sync_state',
+
+    data => {
+
+        const previous =
+            state;
+
+
+        state =
+            data;
+
+
+        currentRoom =
+            data.roomCode;
+
+
+        show(
+            'game-screen'
+        );
+
+
+        renderGame();
+
+
+        requestAnimationFrame(
+
+            () => {
+
+                if (
+
+                    !hasPlayedDealAnimation
+
+                    &&
+
+                    data.isPlaying
+                ) {
+
+                    hasPlayedDealAnimation =
+                        true;
+
+
+                    animateDeal();
+                }
+
+                else if (
+                    previous
+                ) {
+
+                    animateCoinChanges(
+
+                        previous,
+
+                        data
+                    );
+
+
+                    animateRevealedCards(
+
+                        previous,
+
+                        data
+                    );
+                }
+            }
+        );
+    }
+);
+
+
+// =====================================================
+// 게임 렌더
+// =====================================================
+
+function renderGame() {
+
+    if (
+        !state
+    ) {
+
+        return;
+    }
+
+
+    clearInterval(
+        challengeInterval
+    );
+
+
+    challengeInterval =
+        null;
+
+
+    document
+        .getElementById(
+            'log-msg'
+        )
+        .textContent =
+
+            state.log ||
+            '진행 중...';
+
+
+    const me =
+
+        state.players.find(
+
+            player =>
+                player.id ===
+                socket.id
+        );
+
+
+    const enemies =
+
+        state.players.filter(
+
+            player =>
+                player.id !==
+                socket.id
+        );
+
+
+    document
+        .getElementById(
+            'me'
+        )
+        .innerHTML =
+
+            me
+
+                ? playerHtml(
+                    me,
+                    true
+                )
+
+                : '';
+
+
+    document
+        .getElementById(
+            'opponents'
+        )
+        .innerHTML =
+
+            enemies
+
+                .map(
+
+                    player =>
+                        playerHtml(
+                            player,
+                            false
+                        )
+                )
+
+                .join('');
+
+
+    renderHistory(
+        state.history || []
+    );
+
+
+    document
+        .getElementById(
+            'action-area'
+        )
+        .style
+        .display =
+            'none';
+
+
+    document
+        .getElementById(
+            'target-area'
+        )
+        .style
+        .display =
+            'none';
+
+
+    document
+        .getElementById(
+            'prompt-area'
+        )
+        .style
+        .display =
+            'none';
+
+
+    targetAction =
+        null;
+
+
+    const prompt =
+        state.prompt;
+
+
+    if (
+        !prompt
+    ) {
+
+        return;
+    }
+
+
+    // =================================================
+    // 내 턴
+    // =================================================
+
+    if (
+        prompt.type ===
+        'action'
+    ) {
+
+        document
+            .getElementById(
+                'action-area'
+            )
+            .style
+            .display =
+                'block';
+
+
+        return;
+    }
+
+
+    // =================================================
+    // 대기
+    // =================================================
+
+    if (
+        prompt.type ===
+        'wait'
+    ) {
+
+        showPrompt(`
+
+            <p class="muted">
+
+                ${escapeHtml(
+                    prompt.text
+                )}
+
+            </p>
+        `);
+
+
+        return;
+    }
+
+
+    // =================================================
+    // 도전
+    // =================================================
+
+    if (
+        prompt.type ===
+        'challenge'
+    ) {
+
+        showPrompt(`
+
+            <div
+                class="challenge-box"
+            >
+
+                <div
+                    class="challenge-timer"
+                >
+
+                    <span
+                        id="challenge-countdown"
+                    >
+                        8.0
+                    </span>
+
+                    초
+
+                </div>
+
+
+                <div
+                    class="timer-bar"
+                >
+
+                    <div
+                        id="challenge-fill"
+                        class="timer-fill"
+                    ></div>
+
+                </div>
+
+
+                <h3>
+
+                    ${escapeHtml(
+                        prompt.title
+                    )}
+
+                </h3>
+
+
+                <p>
+
+                    ${escapeHtml(
+                        prompt.message
+                    )}
+
+                </p>
+
+
+                <div class="row">
+
+                    <button
+                        onclick="
+                            challenge(
+                                true
+                            )
+                        "
+                    >
+                        ⚔️ 도전
+                    </button>
+
+
+                    <button
+                        class="gray"
+
+                        onclick="
+                            challenge(
+                                false
+                            )
+                        "
+                    >
+                        통과
+                    </button>
+
+                </div>
+
+            </div>
+        `);
+
+
+        startChallengeCountdown(
+            prompt.deadline
+        );
+
+
+        return;
+    }
+
+
+    // =================================================
+    // 방어
+    // =================================================
+
+    if (
+        prompt.type ===
+        'block'
+    ) {
+
+        const buttons =
+
+            prompt.roles
+
+                .map(
+
+                    role => `
+
+                        <button
+
+                            class="blue"
+
+                            onclick="
+                                respondBlock(
+                                    true,
+                                    '${role}'
+                                )
+                            "
+                        >
+
+                            🛡️
+                            ${escapeHtml(
+                                role
+                            )}로 방어
+
+                        </button>
+                    `
+                )
+
+                .join('');
+
+
+        showPrompt(`
+
+            <div
+                class="defense-box"
+            >
+
+                <div
+                    class="challenge-timer"
+                >
+
+                    <span
+                        id="challenge-countdown"
+                    >
+                        8.0
+                    </span>
+
+                    초
+
+                </div>
+
+
+                <div
+                    class="timer-bar"
+                >
+
+                    <div
+                        id="challenge-fill"
+                        class="timer-fill"
+                    ></div>
+
+                </div>
+
+
+                <h3>
+
+                    🛡️
+
+                    ${escapeHtml(
+                        prompt.title
+                    )}
+
+                </h3>
+
+
+                <p>
+
+                    ${escapeHtml(
+                        prompt.message
+                    )}
+
+                </p>
+
+
+                <div class="row">
+
+                    ${buttons}
+
+                    <button
+
+                        class="gray"
+
+                        onclick="
+                            respondBlock(
+                                false
+                            )
+                        "
+                    >
+                        방어하지 않음
+                    </button>
+
+                </div>
+
+            </div>
+        `);
+
+
+        startChallengeCountdown(
+            prompt.deadline
+        );
+
+
+        return;
+    }
+
+
+    // =================================================
+    // 외교관 교환
+    // =================================================
+
+    if (
+        prompt.type ===
+        'exchange'
+    ) {
+
+        exchangeSelection =
+            new Set();
+
+
+        const cards =
+
+            prompt.candidates
+
+                .map(
+
+                    candidate => `
+
+                        <button
+
+                            class="
+                                exchange-choice
+                            "
+
+                            id="
+                                exchange-${candidate.id}
+                            "
+
+                            onclick="
+                                toggleExchangeCard(
+                                    '${candidate.id}',
+                                    ${prompt.keepCount}
+                                )
+                            "
+                        >
+
+                            <img
+
+                                src="
+                                    ${ROLE_IMAGES[
+                                        candidate.role
+                                    ]}
+                                "
+
+                                draggable="
+                                    false
+                                "
+                            >
+
+                            <span>
+
+                                ${escapeHtml(
+                                    candidate.role
+                                )}
+
+                            </span>
+
+                        </button>
+                    `
+                )
+
+                .join('');
+
+
+        showPrompt(`
+
+            <h3>
+                🔄 외교관 카드 교환
+            </h3>
+
+
+            <p>
+
+                아래 카드 중
+
+                <b>
+                    ${prompt.keepCount}장
+                </b>
+
+                을 선택하세요.
+
+            </p>
+
+
+            <div
+                class="exchange-grid"
+            >
+
+                ${cards}
+
+            </div>
+
+
+            <button
+
+                class="green"
+
+                style="
+                    width:100%;
+                    margin-top:10px;
+                "
+
+                onclick="
+                    submitExchange(
+                        ${prompt.keepCount}
+                    )
+                "
+            >
+                선택 완료
+            </button>
+        `);
+
+
+        return;
+    }
+
+
+    // =================================================
+    // 영향력 상실
+    // =================================================
+
+    if (
+        prompt.type ===
+        'lose'
+    ) {
+
+        const buttons =
+
+            me.cards
+
+                .map(
+
+                    (
+                        card,
+                        index
+                    ) => {
+
+                        if (
+                            card.dead
+                        ) {
+
+                            return '';
+                        }
+
+
+                        return `
+
+                            <button
+
+                                onclick="
+                                    loseCard(
+                                        ${index}
+                                    )
+                                "
+                            >
+
+                                ${escapeHtml(
+                                    card.role
+                                )}
+
+                                공개
+
+                            </button>
+                        `;
+                    }
+                )
+
+                .join('');
+
+
+        showPrompt(`
+
+            <h3>
+                💀 영향력 상실
+            </h3>
+
+            <p>
+
+                ${escapeHtml(
+                    prompt.reason
+                )}
+
+            </p>
+
+            <p class="muted">
+                공개할 카드를 선택하세요.
+            </p>
+
+            <div class="row">
+
+                ${buttons}
+
+            </div>
+        `);
+
+
+        return;
+    }
+
+
+    // =================================================
+    // 게임 종료
+    // =================================================
+
+    if (
+        prompt.type ===
+        'game_over'
+    ) {
+
+        showPrompt(`
+
+            <h2>
+
+                🏆
+
+                ${escapeHtml(
+                    prompt.winner
+                )}
+
+                승리!
+
+            </h2>
+        `);
+    }
+}
+
+
+// =====================================================
+// 플레이어 카드 렌더
+// =====================================================
+
+function playerHtml(
+    player,
+    isMe
+) {
+
+    const cards =
+
+        player.cards
+
+            .map(
+
+                (
+                    card,
+                    index
+                ) => {
+
+                    if (
+                        !card.role
+                    ) {
+
+                        return `
+
+                            <div
+
+                                class="
+                                    card
+                                    hidden
+                                "
+
+                                data-card-index="
+                                    ${index}
+                                "
+
+                                data-owner-id="
+                                    ${escapeHtml(
+                                        player.id
+                                    )}
+                                "
+                            >
+                            </div>
+                        `;
+                    }
+
+
+                    const image =
+
+                        ROLE_IMAGES[
+                            card.role
+                        ];
+
+
+                    const tooltip =
+
+                        ROLE_TOOLTIPS[
+                            card.role
+                        ]
+
+                        ||
+
+                        card.role;
+
+
+                    return `
+
+                        <div
+
+                            class="
+                                card
+                                image-card
+
+                                ${
+                                    card.dead
+                                        ? 'dead'
+                                        : ''
+                                }
+                            "
+
+                            data-card-index="
+                                ${index}
+                            "
+
+                            data-owner-id="
+                                ${escapeHtml(
+                                    player.id
+                                )}
+                            "
+
+                            data-tooltip="
+                                ${escapeHtml(
+                                    tooltip
+                                )}
+                            "
+                        >
+
+                            <img
+
+                                src="
+                                    ${image}
+                                "
+
+                                alt="
+                                    ${escapeHtml(
+                                        card.role
+                                    )}
+                                "
+
+                                draggable="
+                                    false
+                                "
+                            >
+
+                        </div>
+                    `;
+                }
+            )
+
+            .join('');
+
+
+    const turnClass =
+
+        state.turnId ===
+        player.id
+
+        &&
+
+        state.phase ===
+        'action'
+
+            ? 'turn'
+
+            : '';
+
+
+    return `
+
+        <div
+
+            class="
+                player
+                ${turnClass}
+
+                ${
+                    isMe
+
+                        ? 'my-player'
+
+                        : 'opponent-player'
+                }
+            "
+
+            id="
+                player-${escapeHtml(
+                    player.id
+                )}
+            "
+        >
+
+            <div class="head">
+
+                <span>
+
+                    ${escapeHtml(
+                        player.name
+                    )}
+
+                    ${
+                        player.isAI
+
+                            ? ' 🤖'
+
+                            : ''
+                    }
+
+                    ${
+                        isMe
+
+                            ? ' (나)'
+
+                            : ''
+                    }
+
+                </span>
+
+
+                <span>
+
+                    🪙
+                    ${player.coins}
+
+                </span>
+
+            </div>
+
+
+            <div class="cards">
+
+                ${cards}
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+// =====================================================
+// 행동 선택
+// =====================================================
+
+function chooseAction(
+    action
+) {
+
+    if (
+        TARGET_ACTIONS.has(
+            action
+        )
+    ) {
+
+        document
+            .getElementById(
+                'action-area'
+            )
+            .style
+            .display =
+                'none';
+
+
+        targetAction =
+            action;
+
+
+        const targets =
+
+            state.players.filter(
+
+                player =>
+                    player.id !==
+                    socket.id
+
+                    &&
+
+                    player.alive
+            );
+
+
+        const buttons =
+
+            targets
+
+                .map(
+
+                    player => `
+
+                        <button
+
+                            onclick="
+                                sendTarget(
+                                    '${player.id}'
+                                )
+                            "
+                        >
+
+                            ${escapeHtml(
+                                player.name
+                            )}
+
+                            ${
+                                player.isAI
+                                    ? ' 🤖'
+                                    : ''
+                            }
+
+                        </button>
+                    `
+                )
+
+                .join('');
+
+
+        const box =
+
+            document
+                .getElementById(
+                    'target-area'
+                );
+
+
+        box.style.display =
+            'block';
+
+
+        box.innerHTML = `
+
+            <h3>
+                🎯 대상 선택
+            </h3>
+
+            <div
+                class="target-list"
+            >
+
+                ${buttons}
+
+                <button
+
+                    class="gray"
+
+                    onclick="
+                        cancelTarget()
+                    "
+                >
+                    취소
+                </button>
+
+            </div>
+        `;
+
+
+        return;
+    }
+
+
+    socket.emit(
+
+        'declare_action',
+
+        {
+
+            roomCode:
+                currentRoom,
+
+            action
+        }
+    );
+}
+
+
+// =====================================================
+// 대상 선택
+// =====================================================
+
+function sendTarget(
+    targetId
+) {
+
+    socket.emit(
+
+        'declare_action',
+
+        {
+
+            roomCode:
+                currentRoom,
+
+            action:
+                targetAction,
+
+            targetId
+        }
+    );
+
+
+    targetAction =
+        null;
+
+
+    document
+        .getElementById(
+            'target-area'
+        )
+        .style
+        .display =
+            'none';
+}
+
+
+function cancelTarget() {
+
+    targetAction =
+        null;
+
+
+    document
+        .getElementById(
+            'target-area'
+        )
+        .style
+        .display =
+            'none';
+
+
+    document
+        .getElementById(
+            'action-area'
+        )
+        .style
+        .display =
+            'block';
+}
+
+
+// =====================================================
+// 도전
+// =====================================================
+
+function challenge(
+    value
+) {
+
+    socket.emit(
+
+        'challenge_response',
+
+        {
+
+            roomCode:
+                currentRoom,
+
+            challenge:
+                value
+        }
+    );
+
+
+    disablePrompt();
+}
+
+
+// =====================================================
+// 방어
+// =====================================================
+
+function respondBlock(
+    block,
+    role = null
+) {
+
+    socket.emit(
+
+        'block_response',
+
+        {
+
+            roomCode:
+                currentRoom,
+
+            block,
+
+            role
+        }
+    );
+
+
+    disablePrompt();
+}
+
+
+// =====================================================
+// 카드 상실
+// =====================================================
+
+function loseCard(
+    index
+) {
+
+    socket.emit(
+
+        'lose_card',
+
+        {
+
+            roomCode:
+                currentRoom,
+
+            cardIndex:
+                index
+        }
+    );
+
+
+    disablePrompt();
+}
+
+
+// =====================================================
+// 외교관 교환
+// =====================================================
+
+function toggleExchangeCard(
+    id,
+    keepCount
+) {
+
+    const element =
+
+        document
+            .getElementById(
+                `exchange-${id}`
+            );
+
+
+    if (
+        exchangeSelection.has(
+            id
+        )
+    ) {
+
+        exchangeSelection.delete(
+            id
+        );
+
+
+        element
+            ?.classList
+            .remove(
+                'selected'
+            );
+
+
+        return;
+    }
+
+
+    if (
+        exchangeSelection.size >=
+        keepCount
+    ) {
+
+        alert(
+            `${keepCount}장까지만 선택할 수 있습니다.`
+        );
+
+        return;
+    }
+
+
+    exchangeSelection.add(
+        id
+    );
+
+
+    element
+        ?.classList
+        .add(
+            'selected'
+        );
+}
+
+
+function submitExchange(
+    keepCount
+) {
+
+    if (
+        exchangeSelection.size !==
+        keepCount
+    ) {
+
+        alert(
+            `${keepCount}장을 선택해주세요.`
+        );
+
+        return;
+    }
+
+
+    socket.emit(
+
+        'exchange_choice',
+
+        {
+
+            roomCode:
+                currentRoom,
+
+            selectedIds:
+                [
+                    ...exchangeSelection
+                ]
+        }
+    );
+
+
+    disablePrompt();
+}
+
+
+// =====================================================
+// 프롬프트
+// =====================================================
+
+function showPrompt(
+    html
+) {
+
+    const box =
+
+        document
+            .getElementById(
+                'prompt-area'
+            );
+
+
+    box.style.display =
+        'block';
+
+
+    box.innerHTML =
+        html;
+}
+
+
+function disablePrompt() {
+
+    document
+
+        .querySelectorAll(
+            '#prompt-area button'
+        )
+
+        .forEach(
+
+            button => {
+
+                button.disabled =
+                    true;
+            }
+        );
+}
+
+
+// =====================================================
+// 타이머
+// =====================================================
+
+function startChallengeCountdown(
+    deadline
+) {
+
+    const total =
+
+        Math.max(
+
+            1,
+
+            deadline -
+            Date.now()
+        );
+
+
+    function update() {
+
+        const left =
+
+            Math.max(
+
+                0,
+
+                deadline -
+                Date.now()
+            );
+
+
+        const text =
+
+            document
+                .getElementById(
+                    'challenge-countdown'
+                );
+
+
+        const fill =
+
+            document
+                .getElementById(
+                    'challenge-fill'
+                );
+
+
+        if (
+            text
+        ) {
+
+            text.textContent =
+
+                (
+                    left /
+                    1000
+                )
+
+                    .toFixed(
+                        1
+                    );
+        }
+
+
+        if (
+            fill
+        ) {
+
+            fill.style.transform =
+
+                `scaleX(${
+                    Math.max(
+                        0,
+
+                        Math.min(
+                            1,
+
+                            left /
+                            total
+                        )
+                    )
+                })`;
+        }
+
+
+        if (
+            left <= 0
+        ) {
+
+            clearInterval(
+                challengeInterval
+            );
+
+
+            challengeInterval =
+                null;
+
+
+            disablePrompt();
+        }
+    }
+
+
+    update();
+
+
+    challengeInterval =
+
+        setInterval(
+            update,
+            100
+        );
+}
+
+
+// =====================================================
+// 로그 렌더
+// =====================================================
+
+function renderHistory(
+    history
+) {
+
+    const box =
+
+        document
+            .getElementById(
+                'history-list'
+            );
+
+
+    if (
+        !history.length
+    ) {
+
+        box.innerHTML =
+            '아직 기록이 없습니다.';
+
+        return;
+    }
+
+
+    box.innerHTML =
+
+        history
+
+            .map(
+
+                item => {
+
+                    const time =
+
+                        new Date(
+                            item.ts
+                        )
+
+                            .toLocaleTimeString(
+
+                                'ko-KR',
+
+                                {
+
+                                    hour:
+                                        '2-digit',
+
+                                    minute:
+                                        '2-digit',
+
+                                    second:
+                                        '2-digit'
+                                }
+                            );
+
+
+                    return `
+
+                        <div
+
+                            class="
+                                history-item
+                                ${escapeHtml(
+                                    item.type ||
+                                    'info'
+                                )}
+                            "
+                        >
+
+                            <span
+                                class="
+                                    history-time
+                                "
+                            >
+
+                                ${time}
+
+                            </span>
+
+                            ${escapeHtml(
+                                item.text
+                            )}
+
+                        </div>
+                    `;
+                }
+            )
+
+            .join('');
+
+
+    box.scrollTop =
+        box.scrollHeight;
+}
+
+
+// =====================================================
+// 카드 배분 애니메이션
+// =====================================================
+
+function animateDeal() {
+
+    const deck =
+
+        document
+            .getElementById(
+                'deck-pile'
+            );
+
+
+    if (!deck) {
+        return;
+    }
+
+
+    const deckRect =
+        deck.getBoundingClientRect();
+
+
+    const cards =
+        [
+            ...document
+                .querySelectorAll(
+                    '.card'
+                )
+        ];
+
+
+    cards.forEach(
+
+        (
+            card,
+            index
+        ) => {
+
+            const rect =
+                card.getBoundingClientRect();
+
+
+            const dx =
+
+                (
+                    deckRect.left +
+                    deckRect.width / 2
+                )
+
+                -
+
+                (
+                    rect.left +
+                    rect.width / 2
+                );
+
+
+            const dy =
+
+                (
+                    deckRect.top +
+                    deckRect.height / 2
+                )
+
+                -
+
+                (
+                    rect.top +
+                    rect.height / 2
+                );
+
+
+            card.animate(
+
+                [
+
+                    {
+                        transform:
+                            `translate(${dx}px, ${dy}px) rotate(-18deg) scale(.72)`,
+
+                        opacity:
+                            0
+                    },
+
+                    {
+                        transform:
+                            'translate(0,0) rotate(0) scale(1)',
+
+                        opacity:
+                            1
+                    }
+                ],
+
+                {
+
+                    duration:
+                        520,
+
+                    delay:
+                        index *
+                        130,
+
+                    easing:
+                        'cubic-bezier(.2,.8,.2,1)',
+
+                    fill:
+                        'both'
+                }
+            );
+        }
+    );
+}
+
+
+// =====================================================
+// 코인 변화 감지
+// =====================================================
+
+function animateCoinChanges(
+    previous,
+    current
+) {
+
+    for (
+        const nowPlayer
+        of
+        current.players
+    ) {
+
+        const oldPlayer =
+
+            previous.players.find(
+
+                player =>
+                    player.id ===
+                    nowPlayer.id
+            );
+
+
+        if (
+            !oldPlayer
+        ) {
+
+            continue;
+        }
+
+
+        const delta =
+
+            nowPlayer.coins -
+            oldPlayer.coins;
+
+
+        if (
+            delta !== 0
+        ) {
+
+            animateCoins(
+
+                nowPlayer.id,
+
+                delta
+            );
+        }
+    }
+}
+
+
+// =====================================================
+// 코인 애니메이션
+// =====================================================
+
+function animateCoins(
+    playerId,
+    delta
+) {
+
+    const bank =
+
+        document
+            .getElementById(
+                'bank'
+            );
+
+
+    const player =
+
+        document
+            .getElementById(
+                `player-${playerId}`
+            );
+
+
+    if (
+        !bank ||
+        !player
+    ) {
+
+        return;
+    }
+
+
+    const bankRect =
+        bank.getBoundingClientRect();
+
+
+    const playerRect =
+        player.getBoundingClientRect();
+
+
+    const startRect =
+
+        delta > 0
+
+            ? bankRect
+
+            : playerRect;
+
+
+    const endRect =
+
+        delta > 0
+
+            ? playerRect
+
+            : bankRect;
+
+
+    const startX =
+
+        startRect.left +
+        startRect.width / 2;
+
+
+    const startY =
+
+        startRect.top +
+        startRect.height / 2;
+
+
+    const endX =
+
+        endRect.left +
+        endRect.width / 2;
+
+
+    const endY =
+
+        endRect.top +
+        endRect.height / 2;
+
+
+    const count =
+
+        Math.min(
+
+            Math.abs(
+                delta
+            ),
+
+            4
+        );
+
+
+    for (
+        let i = 0;
+        i < count;
+        i++
+    ) {
+
+        const coin =
+
+            document
+                .createElement(
+                    'div'
+                );
+
+
+        coin.className =
+            'coin-fx';
+
+
+        coin.textContent =
+            '🪙';
+
+
+        coin.style.left =
+            `${startX - 12}px`;
+
+
+        coin.style.top =
+            `${startY - 12}px`;
+
+
+        document.body
+            .appendChild(
+                coin
+            );
+
+
+        const animation =
+
+            coin.animate(
+
+                [
+
+                    {
+                        transform:
+                            'translate(0,0) scale(1)',
+
+                        opacity:
+                            1
+                    },
+
+                    {
+                        transform:
+                            `translate(${endX - startX}px, ${endY - startY}px) scale(.7)`,
+
+                        opacity:
+                            .3
+                    }
+                ],
+
+                {
+
+                    duration:
+                        650,
+
+                    delay:
+                        i * 90,
+
+                    easing:
+                        'cubic-bezier(.25,.8,.25,1)'
+                }
+            );
+
+
+        animation.onfinish =
+            () =>
+                coin.remove();
+    }
+
+
+    const badge =
+
+        document
+            .createElement(
+                'div'
+            );
+
+
+    badge.className =
+        'amount-fx';
+
+
+    badge.textContent =
+
+        delta > 0
+
+            ? `+${delta}`
+
+            : `${delta}`;
+
+
+    badge.style.left =
+        `${playerRect.right - 45}px`;
+
+
+    badge.style.top =
+        `${playerRect.top + 10}px`;
+
+
+    document.body
+        .appendChild(
+            badge
+        );
+
+
+    const anim =
+
+        badge.animate(
+
+            [
+
+                {
+                    transform:
+                        'translateY(10px)',
+
+                    opacity:
+                        0
+                },
+
+                {
+                    transform:
+                        'translateY(0)',
+
+                    opacity:
+                        1,
+
+                    offset:
+                        .25
+                },
+
+                {
+                    transform:
+                        'translateY(-25px)',
+
+                    opacity:
+                        0
+                }
+            ],
+
+            {
+                duration:
+                    900
+            }
+        );
+
+
+    anim.onfinish =
+        () =>
+            badge.remove();
+}
+
+
+// =====================================================
+// 카드 공개 애니메이션
+// =====================================================
+
+function animateRevealedCards(
+    previous,
+    current
+) {
+
+    for (
+        const player
+        of
+        current.players
+    ) {
+
+        const old =
+
+            previous.players.find(
+
+                oldPlayer =>
+                    oldPlayer.id ===
+                    player.id
+            );
+
+
+        if (
+            !old
+        ) {
+
+            continue;
+        }
+
+
+        player.cards.forEach(
+
+            (
+                card,
+                index
+            ) => {
+
+                const oldCard =
+                    old.cards[
+                        index
+                    ];
+
+
+                if (
+                    !oldCard
+
+                    ||
+
+                    oldCard.dead
+
+                    ||
+
+                    !card.dead
+                ) {
+
+                    return;
+                }
+
+
+                const owner =
+
+                    document
+                        .getElementById(
+                            `player-${player.id}`
+                        );
+
+
+                const element =
+
+                    owner?.querySelector(
+
+                        `[data-card-index="${index}"]`
+                    );
+
+
+                if (
+                    !element
+                ) {
+
+                    return;
+                }
+
+
+                element.animate(
+
+                    [
+
+                        {
+                            transform:
+                                'scale(1)'
+                        },
+
+                        {
+                            transform:
+                                'scale(1.13) rotate(-5deg)'
+                        },
+
+                        {
+                            transform:
+                                'scale(1)'
+                        }
+                    ],
+
+                    {
+                        duration:
+                            520
+                    }
+                );
+            }
+        );
+    }
+}
+
+
+// =====================================================
+// 연출 큐
+// =====================================================
+
+async function runVisualQueue() {
+
+    if (
+        visualPlaying
+
+        ||
+
+        !visualQueue.length
+    ) {
+
+        return;
+    }
+
+
+    visualPlaying =
+        true;
+
+
+    const event =
+        visualQueue.shift();
+
+
+    try {
+
+        if (
+            event.type ===
+            'challenge_result'
+        ) {
+
+            await playChallengeResult(
+                event
+            );
+        }
+
+        else if (
+            event.type ===
+            'influence_lost'
+        ) {
+
+            await playInfluenceLost(
+                event
+            );
+        }
+    }
+
+    finally {
+
+        visualPlaying =
+            false;
+
+
+        if (
+            visualQueue.length
+        ) {
+
+            runVisualQueue();
+        }
+    }
+}
+
+
+// =====================================================
+// 시네마틱 열기
+// =====================================================
+
+function openCinematic(
+    html,
+    redFlash = false
+) {
+
+    const overlay =
+
+        document
+            .getElementById(
+                'cinematic-overlay'
+            );
+
+
+    const content =
+
+        document
+            .getElementById(
+                'cinematic-content'
+            );
+
+
+    content.innerHTML =
+        html;
+
+
+    overlay.classList.toggle(
+        'red-flash',
+        redFlash
+    );
+
+
+    requestAnimationFrame(
+
+        () => {
+
+            overlay.classList.add(
+                'show'
+            );
+        }
+    );
+}
+
+
+// =====================================================
+// 시네마틱 닫기
+// =====================================================
+
+function closeCinematic() {
+
+    return new Promise(
+
+        resolve => {
+
+            const overlay =
+
+                document
+                    .getElementById(
+                        'cinematic-overlay'
+                    );
+
+
+            overlay.classList.remove(
+                'show'
+            );
+
+
+            setTimeout(
+
+                () => {
+
+                    overlay.classList.remove(
+                        'red-flash'
+                    );
+
+
+                    document
+                        .getElementById(
+                            'cinematic-content'
+                        )
+                        .innerHTML =
+                            '';
+
+
+                    resolve();
+
+                },
+
+                280
+            );
+        }
+    );
+}
+
+
+// =====================================================
+// 대기
+// =====================================================
+
+function sleep(
+    ms
+) {
+
+    return new Promise(
+
+        resolve => {
+
+            setTimeout(
+                resolve,
+                ms
+            );
+        }
+    );
+}
+
+
+// =====================================================
+// 도전 결과 연출
+// =====================================================
+
+async function playChallengeResult(
+    event
+) {
+
+    const image =
+
+        ROLE_IMAGES[
+            event.role
+        ];
+
+
+    const title =
+
+        event.context ===
+        'block'
+
+            ? '🛡️ 방어 도전'
+
+            : '⚔️ CHALLENGE';
+
+
+    openCinematic(`
+
+        <div class="cinematic-title">
+
+            ${title}
+
+        </div>
+
+
+        <div class="cinematic-subtitle">
+
+            ${escapeHtml(
+                event.challengerName
+            )}
+
+            님이
+
+            ${escapeHtml(
+                event.actorName
+            )}
+
+            님의
+
+            <b>
+
+                [${escapeHtml(
+                    event.role
+                )}]
+
+            </b>
+
+            주장에 도전했습니다.
+
+        </div>
+
+
+        <div
+
+            class="
+                cinematic-card
+
+                ${
+                    event.truthful
+
+                        ? ''
+
+                        : 'false'
+                }
+            "
+        >
+
+            <img
+                src="${image}"
+                draggable="false"
+            >
+
+        </div>
+
+
+        <div
+
+            class="
+                cinematic-result
+
+                ${
+                    event.truthful
+
+                        ? 'success'
+
+                        : 'fail'
+                }
+            "
+        >
+
+            ${
+                event.truthful
+
+                    ? '✅ 진짜 역할! 도전 실패'
+
+                    : '❌ 거짓 역할! 도전 성공'
+            }
+
+        </div>
+    `);
+
+
+    await sleep(
+        1750
+    );
+
+
+    await closeCinematic();
+}
+
+
+// =====================================================
+// 영향력 상실 연출
+// =====================================================
+
+async function playInfluenceLost(
+    event
+) {
+
+    const image =
+
+        ROLE_IMAGES[
+            event.role
+        ];
+
+
+    openCinematic(
+
+        `
+
+        <div
+            class="
+                cinematic-title
+                death-title
+            "
+        >
+
+            영향력 상실
+
+        </div>
+
+
+        <div class="cinematic-subtitle">
+
+            ${escapeHtml(
+                event.playerName
+            )}
+
+            님의 카드가 공개됩니다.
+
+        </div>
+
+
+        <div
+            class="
+                cinematic-card
+                death
+            "
+        >
+
+            <img
+                src="${image}"
+                draggable="false"
+            >
+
+        </div>
+
+
+        <div
+            class="
+                cinematic-result
+                fail
+            "
+        >
+
+            💀
+            ${escapeHtml(
+                event.role
+            )}
+
+            공개
+
+        </div>
+
+
+        ${
+            event.eliminated
+
+                ? `
+
+                    <div class="eliminated-title">
+
+                        PLAYER OUT
+
+                    </div>
+                `
+
+                : ''
+        }
+
+        `,
+
+        true
+    );
+
+
+    await sleep(
+
+        event.eliminated
+
+            ? 1900
+
+            : 1450
+    );
+
+
+    await closeCinematic();
+}
+
+
+// =====================================================
+// HTML 안전 처리
+// =====================================================
+
+function escapeHtml(
+    value
+) {
+
+    return String(
+        value ?? ''
+    )
+
+        .replaceAll(
+            '&',
+            '&amp;'
+        )
+
+        .replaceAll(
+            '<',
+            '&lt;'
+        )
+
+        .replaceAll(
+            '>',
+            '&gt;'
+        )
+
+        .replaceAll(
+            '"',
+            '&quot;'
+        )
+
+        .replaceAll(
+            "'",
+            '&#039;'
+        );
+}
+
+
+</script>
+
+</body>
+
+</html>
