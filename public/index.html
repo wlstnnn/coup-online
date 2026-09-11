@@ -57,6 +57,7 @@ input {
 
 button {
     border: 0;
+
     border-radius: 8px;
 
     padding: 10px 13px;
@@ -64,6 +65,7 @@ button {
     font-weight: 800;
 
     background: #ef4444;
+
     color: white;
 
     cursor: pointer;
@@ -76,8 +78,7 @@ button {
 button:hover:not(:disabled) {
     filter: brightness(1.1);
 
-    transform:
-        translateY(-1px);
+    transform: translateY(-1px);
 }
 
 button.blue {
@@ -94,7 +95,9 @@ button.gray {
 
 button:disabled {
     opacity: .42;
+
     cursor: default;
+
     transform: none;
 }
 
@@ -110,6 +113,7 @@ input {
         #3f3f46;
 
     background: #27272a;
+
     color: white;
 
     margin:
@@ -118,6 +122,7 @@ input {
 
 .screen {
     max-width: 850px;
+
     margin: auto;
 }
 
@@ -165,12 +170,15 @@ p {
 
 .row {
     display: flex;
+
     gap: 8px;
+
     flex-wrap: wrap;
 }
 
 .row button {
     flex: 1;
+
     min-width: 120px;
 }
 
@@ -214,11 +222,13 @@ p {
 
 #wait-room {
     display: none;
+
     max-width: 500px;
 }
 
 #waiting-list {
     padding-left: 22px;
+
     line-height: 1.8;
 }
 
@@ -239,11 +249,9 @@ p {
             100vh - 24px
         );
 
-    margin:
-        0 auto;
+    margin: 0 auto;
 
-    display:
-        none;
+    display: none;
 
     grid-template-columns:
         minmax(0, 1fr)
@@ -266,7 +274,7 @@ p {
 
 
 /* ================================================= */
-/* 상단 */
+/* 상단 상태 */
 /* ================================================= */
 
 .game-status {
@@ -291,6 +299,7 @@ p {
     text-align: center;
 
     font-size: 18px;
+
     font-weight: 900;
 
     line-height: 1.4;
@@ -301,11 +310,12 @@ p {
 
     align-items: center;
 
-    gap: 10px;
+    gap: 8px;
 }
 
 #deck-pile {
     width: 54px;
+
     height: 72px;
 
     border:
@@ -346,8 +356,7 @@ p {
     padding:
         10px 12px;
 
-    border-radius:
-        999px;
+    border-radius: 999px;
 
     background: #27272a;
 
@@ -519,6 +528,7 @@ p {
 
 .card.image-card img {
     width: 100%;
+
     height: 100%;
 
     display: block;
@@ -550,7 +560,7 @@ p {
 
 
 /* ================================================= */
-/* 툴팁 */
+/* 카드 툴팁 */
 /* ================================================= */
 
 .card[data-tooltip]::after {
@@ -592,12 +602,15 @@ p {
     color: white;
 
     font-size: 12px;
+
     font-weight: 700;
+
     line-height: 1.5;
 
     text-align: center;
 
     opacity: 0;
+
     visibility: hidden;
 
     pointer-events: none;
@@ -609,6 +622,7 @@ p {
 
 .card[data-tooltip]:hover::after {
     opacity: 1;
+
     visibility: visible;
 
     transform:
@@ -687,6 +701,7 @@ p {
     position: absolute;
 
     left: 50%;
+
     top: 50%;
 
     transform:
@@ -695,7 +710,8 @@ p {
 
     z-index: 10;
 
-    padding: 5px 7px;
+    padding:
+        5px 7px;
 
     border:
         2px solid
@@ -714,6 +730,7 @@ p {
         );
 
     font-size: 11px;
+
     font-weight: 900;
 
     white-space: nowrap;
@@ -842,6 +859,7 @@ p {
 
 .timer-fill {
     width: 100%;
+
     height: 100%;
 
     background: #ef4444;
@@ -923,6 +941,7 @@ p {
     margin-top: 5px;
 
     font-size: 11px;
+
     font-weight: 900;
 }
 
@@ -980,7 +999,8 @@ p {
 
     border-radius: 6px;
 
-    padding: 7px 8px;
+    padding:
+        7px 8px;
 
     font-size: 12px;
 
@@ -1074,7 +1094,8 @@ p {
             .86
         );
 
-    backdrop-filter: blur(6px);
+    backdrop-filter:
+        blur(6px);
 
     opacity: 0;
 
@@ -1088,6 +1109,7 @@ p {
 
 .cinematic-overlay.show {
     opacity: 1;
+
     visibility: visible;
 }
 
@@ -1113,6 +1135,7 @@ p {
 .cinematic-overlay.show
 .cinematic-content {
     transform: scale(1);
+
     opacity: 1;
 }
 
@@ -1155,6 +1178,7 @@ p {
 
 .cinematic-card img {
     width: 100%;
+
     height: 100%;
 
     object-fit: cover;
@@ -1269,7 +1293,8 @@ p {
 @keyframes deathCard {
 
     0% {
-        transform: scale(1);
+        transform:
+            scale(1);
     }
 
     20% {
@@ -1359,7 +1384,8 @@ p {
     }
 
     .game-controls {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            1fr;
     }
 
     .history-panel {
@@ -1517,7 +1543,6 @@ p {
 <div id="game-screen">
 
 
-    <!-- 상단 -->
     <div
         class="
             game-status
@@ -1542,6 +1567,16 @@ p {
                     🪙 BANK
                 </div>
 
+
+                <button
+                    id="sound-toggle"
+                    class="gray"
+                    onclick="toggleSound()"
+                >
+                    🔊 효과음
+                </button>
+
+
                 <button
                     class="gray"
                     onclick="leaveGame()"
@@ -1556,7 +1591,6 @@ p {
     </div>
 
 
-    <!-- 상대 -->
     <div
         class="
             game-table
@@ -1573,8 +1607,8 @@ p {
     </div>
 
 
-    <!-- 하단 -->
     <div class="game-controls">
+
 
         <div
             class="
@@ -1691,7 +1725,6 @@ p {
     </div>
 
 
-    <!-- 기록 -->
     <div
         class="
             history-panel
@@ -1743,7 +1776,7 @@ const socket =
 
 
 // =====================================================
-// 이미지
+// 카드 이미지
 // =====================================================
 
 const ROLE_IMAGES = {
@@ -1788,6 +1821,10 @@ const ROLE_TOOLTIPS = {
 };
 
 
+// =====================================================
+// 기본 상태
+// =====================================================
+
 let currentRoom =
     '';
 
@@ -1820,6 +1857,10 @@ let visualPlaying =
     false;
 
 
+let victorySoundPlayed =
+    false;
+
+
 const TARGET_ACTIONS =
     new Set([
         'coup',
@@ -1829,10 +1870,705 @@ const TARGET_ACTIONS =
 
 
 // =====================================================
-// 화면
+// SOUND SYSTEM
 // =====================================================
 
-function show(name) {
+let audioContext =
+    null;
+
+
+let soundEnabled =
+
+    localStorage.getItem(
+        'coup_sound'
+    ) !== 'off';
+
+
+// =====================================================
+// 오디오 활성화
+// =====================================================
+
+function unlockAudio() {
+
+    try {
+
+        if (
+            !audioContext
+        ) {
+
+            const AudioContextClass =
+
+                window.AudioContext
+                ||
+                window.webkitAudioContext;
+
+
+            if (
+                !AudioContextClass
+            ) {
+
+                return;
+            }
+
+
+            audioContext =
+                new AudioContextClass();
+        }
+
+
+        if (
+            audioContext.state ===
+            'suspended'
+        ) {
+
+            audioContext.resume();
+        }
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.log(
+            'Audio unlock failed',
+            error
+        );
+    }
+}
+
+
+// 브라우저 최초 클릭 후 오디오 활성화
+document.addEventListener(
+    'pointerdown',
+    unlockAudio
+);
+
+
+// =====================================================
+// 사운드 버튼
+// =====================================================
+
+function updateSoundButton() {
+
+    const button =
+
+        document
+            .getElementById(
+                'sound-toggle'
+            );
+
+
+    if (
+        !button
+    ) {
+
+        return;
+    }
+
+
+    button.textContent =
+
+        soundEnabled
+
+            ? '🔊 효과음'
+
+            : '🔇 음소거';
+}
+
+
+function toggleSound() {
+
+    soundEnabled =
+        !soundEnabled;
+
+
+    localStorage.setItem(
+
+        'coup_sound',
+
+        soundEnabled
+
+            ? 'on'
+
+            : 'off'
+    );
+
+
+    updateSoundButton();
+
+
+    if (
+        soundEnabled
+    ) {
+
+        unlockAudio();
+
+        playSfx(
+            'coin'
+        );
+    }
+}
+
+
+// =====================================================
+// 기본 톤 생성
+// =====================================================
+
+function tone(
+    frequency,
+    duration,
+    type = 'sine',
+    volume = 0.06,
+    delay = 0,
+    endFrequency = null
+) {
+
+    if (
+        !soundEnabled
+
+        ||
+
+        document.visibilityState !==
+        'visible'
+    ) {
+
+        return;
+    }
+
+
+    unlockAudio();
+
+
+    if (
+        !audioContext
+    ) {
+
+        return;
+    }
+
+
+    const ctx =
+        audioContext;
+
+
+    const start =
+        ctx.currentTime +
+        delay;
+
+
+    const oscillator =
+        ctx.createOscillator();
+
+
+    const gain =
+        ctx.createGain();
+
+
+    oscillator.type =
+        type;
+
+
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        start
+    );
+
+
+    if (
+        endFrequency !== null
+    ) {
+
+        oscillator.frequency
+            .exponentialRampToValueAtTime(
+
+                Math.max(
+                    20,
+                    endFrequency
+                ),
+
+                start +
+                duration
+            );
+    }
+
+
+    gain.gain.setValueAtTime(
+        0.0001,
+        start
+    );
+
+
+    gain.gain
+        .exponentialRampToValueAtTime(
+
+            volume,
+
+            start +
+            0.015
+        );
+
+
+    gain.gain
+        .exponentialRampToValueAtTime(
+
+            0.0001,
+
+            start +
+            duration
+        );
+
+
+    oscillator.connect(
+        gain
+    );
+
+
+    gain.connect(
+        ctx.destination
+    );
+
+
+    oscillator.start(
+        start
+    );
+
+
+    oscillator.stop(
+        start +
+        duration +
+        .03
+    );
+}
+
+
+// =====================================================
+// 노이즈 효과
+// =====================================================
+
+function noise(
+    duration = .2,
+    volume = .04,
+    delay = 0
+) {
+
+    if (
+        !soundEnabled
+
+        ||
+
+        document.visibilityState !==
+        'visible'
+    ) {
+
+        return;
+    }
+
+
+    unlockAudio();
+
+
+    const ctx =
+        audioContext;
+
+
+    if (
+        !ctx
+    ) {
+
+        return;
+    }
+
+
+    const length =
+
+        Math.floor(
+            ctx.sampleRate *
+            duration
+        );
+
+
+    const buffer =
+
+        ctx.createBuffer(
+            1,
+            length,
+            ctx.sampleRate
+        );
+
+
+    const data =
+
+        buffer
+            .getChannelData(
+                0
+            );
+
+
+    for (
+        let i = 0;
+        i < length;
+        i++
+    ) {
+
+        data[i] =
+
+            Math.random() *
+            2 -
+            1;
+    }
+
+
+    const source =
+        ctx.createBufferSource();
+
+
+    const gain =
+        ctx.createGain();
+
+
+    source.buffer =
+        buffer;
+
+
+    const start =
+        ctx.currentTime +
+        delay;
+
+
+    gain.gain.setValueAtTime(
+        volume,
+        start
+    );
+
+
+    gain.gain
+        .exponentialRampToValueAtTime(
+
+            .0001,
+
+            start +
+            duration
+        );
+
+
+    source.connect(
+        gain
+    );
+
+
+    gain.connect(
+        ctx.destination
+    );
+
+
+    source.start(
+        start
+    );
+}
+
+
+// =====================================================
+// 효과음 종류
+// =====================================================
+
+function playSfx(
+    name
+) {
+
+    if (
+        !soundEnabled
+
+        ||
+
+        document.visibilityState !==
+        'visible'
+    ) {
+
+        return;
+    }
+
+
+    switch (
+        name
+    ) {
+
+
+        // 카드 나눠주기
+        case 'deal':
+
+            noise(
+                .055,
+                .025
+            );
+
+
+            tone(
+                520,
+                .06,
+                'triangle',
+                .025
+            );
+
+            break;
+
+
+        // 버튼 / 행동
+        case 'action':
+
+            tone(
+                320,
+                .07,
+                'triangle',
+                .04,
+                0,
+                430
+            );
+
+            break;
+
+
+        // 코인
+        case 'coin':
+
+            tone(
+                950,
+                .1,
+                'sine',
+                .05
+            );
+
+
+            tone(
+                1350,
+                .13,
+                'sine',
+                .035,
+                .07
+            );
+
+            break;
+
+
+        // 도전
+        case 'challenge':
+
+            tone(
+                210,
+                .32,
+                'sawtooth',
+                .065,
+                0,
+                110
+            );
+
+
+            tone(
+                420,
+                .18,
+                'square',
+                .025
+            );
+
+            break;
+
+
+        // 카드 공개
+        case 'reveal':
+
+            noise(
+                .14,
+                .035
+            );
+
+
+            tone(
+                650,
+                .15,
+                'triangle',
+                .04,
+                0,
+                900
+            );
+
+            break;
+
+
+        // 성공
+        case 'success':
+
+            tone(
+                523,
+                .13,
+                'sine',
+                .045
+            );
+
+
+            tone(
+                659,
+                .13,
+                'sine',
+                .045,
+                .11
+            );
+
+
+            tone(
+                784,
+                .22,
+                'sine',
+                .055,
+                .22
+            );
+
+            break;
+
+
+        // 실패
+        case 'fail':
+
+            tone(
+                400,
+                .18,
+                'sawtooth',
+                .045
+            );
+
+
+            tone(
+                270,
+                .24,
+                'sawtooth',
+                .045,
+                .14
+            );
+
+            break;
+
+
+        // 방어
+        case 'block':
+
+            tone(
+                420,
+                .12,
+                'square',
+                .045
+            );
+
+
+            tone(
+                840,
+                .18,
+                'triangle',
+                .03
+            );
+
+            break;
+
+
+        // 죽음
+        case 'death':
+
+            noise(
+                .35,
+                .055
+            );
+
+
+            tone(
+                160,
+                .55,
+                'sawtooth',
+                .065,
+                0,
+                60
+            );
+
+            break;
+
+
+        // 외교관
+        case 'exchange':
+
+            tone(
+                450,
+                .06,
+                'triangle',
+                .025
+            );
+
+
+            tone(
+                570,
+                .06,
+                'triangle',
+                .025,
+                .07
+            );
+
+
+            tone(
+                690,
+                .06,
+                'triangle',
+                .025,
+                .14
+            );
+
+            break;
+
+
+        // 승리
+        case 'victory':
+
+            tone(
+                523,
+                .16,
+                'triangle',
+                .055
+            );
+
+
+            tone(
+                659,
+                .16,
+                'triangle',
+                .055,
+                .15
+            );
+
+
+            tone(
+                784,
+                .16,
+                'triangle',
+                .06,
+                .30
+            );
+
+
+            tone(
+                1046,
+                .5,
+                'triangle',
+                .07,
+                .45
+            );
+
+            break;
+    }
+}
+
+
+// =====================================================
+// 화면 전환
+// =====================================================
+
+function show(
+    name
+) {
 
     document
         .getElementById(
@@ -1877,11 +2613,14 @@ function show(name) {
                 ? 'grid'
 
                 : 'none';
+
+
+    updateSoundButton();
 }
 
 
 // =====================================================
-// 닉네임 / 방
+// 방 관련
 // =====================================================
 
 function nick() {
@@ -1904,6 +2643,9 @@ function nick() {
 
 function createRoom() {
 
+    unlockAudio();
+
+
     socket.emit(
         'create_room',
         nick()
@@ -1911,7 +2653,12 @@ function createRoom() {
 }
 
 
-function joinRoom(code) {
+function joinRoom(
+    code
+) {
+
+    unlockAudio();
+
 
     currentRoom =
 
@@ -1952,6 +2699,11 @@ function joinByCode() {
 
 function addAI() {
 
+    playSfx(
+        'action'
+    );
+
+
     socket.emit(
         'add_ai',
         currentRoom
@@ -1960,6 +2712,14 @@ function addAI() {
 
 
 function startGame() {
+
+    unlockAudio();
+
+
+    playSfx(
+        'action'
+    );
+
 
     socket.emit(
         'start_game',
@@ -2090,6 +2850,10 @@ socket.on(
             false;
 
 
+        victorySoundPlayed =
+            false;
+
+
         visualQueue =
             [];
 
@@ -2107,19 +2871,7 @@ socket.on(
             null;
 
 
-        const overlay =
-
-            document
-                .getElementById(
-                    'cinematic-overlay'
-                );
-
-
-        overlay
-            ?.classList
-            .remove(
-                'show'
-            );
+        clearCinematic();
 
 
         show(
@@ -2135,15 +2887,16 @@ socket.on(
 
 
 // =====================================================
-// 시각 이벤트
+// 시각 연출 이벤트
 // =====================================================
 
 socket.on(
+
     'visual_event',
 
     event => {
 
-        // 다른 탭 보고 있는 중이면
+        // 백그라운드 탭이면
         // 오래된 연출을 쌓지 않음
         if (
             document.visibilityState !==
@@ -2158,62 +2911,48 @@ socket.on(
             event
         );
 
+
         runVisualQueue();
     }
 );
+
+
 // =====================================================
-// 탭 전환 시 시네마틱 꼬임 방지
+// 탭 전환 문제 방지
 // =====================================================
 
 document.addEventListener(
+
     'visibilitychange',
+
     () => {
 
-        // 다시 화면으로 돌아왔을 때
+        // 탭으로 돌아왔을 때
+        // 남은 블러 / 시네마틱 제거
         if (
             document.visibilityState ===
             'visible'
         ) {
 
-            const overlay =
-                document.getElementById(
-                    'cinematic-overlay'
-                );
-
-            overlay
-                ?.classList
-                .remove(
-                    'show',
-                    'red-flash'
-                );
+            clearCinematic();
 
 
-            const content =
-                document.getElementById(
-                    'cinematic-content'
-                );
-
-            if (
-                content
-            ) {
-
-                content.innerHTML =
-                    '';
-            }
-
-
-            // 이전 탭에서 밀린 연출 폐기
             visualQueue =
                 [];
 
+
             visualPlaying =
                 false;
+
+
+            unlockAudio();
         }
     }
 );
 
+
 // =====================================================
-// 로비
+// 로비 업데이트
 // =====================================================
 
 socket.on(
@@ -2256,11 +2995,13 @@ socket.on(
                     ([code, room]) => {
 
                         const full =
-                            room.players.length >= 5;
+                            room.players.length >=
+                            5;
 
 
                         const disabled =
-                            room.isPlaying || full;
+                            room.isPlaying ||
+                            full;
 
 
                         let status =
@@ -2313,7 +3054,9 @@ socket.on(
 
                                     ${
                                         disabled
+
                                             ? 'disabled'
+
                                             : ''
                                     }
 
@@ -2323,7 +3066,9 @@ socket.on(
                                         )
                                     "
                                 >
+
                                     참가
+
                                 </button>
 
                             </div>
@@ -2416,7 +3161,9 @@ function renderWaiting(
 
                             ${
                                 player.isAI
+
                                     ? ' 🤖'
+
                                     : ''
                             }
 
@@ -2448,6 +3195,16 @@ socket.on(
 
         currentRoom =
             data.roomCode;
+
+
+        if (
+            data.phase !==
+            'game_over'
+        ) {
+
+            victorySoundPlayed =
+                false;
+        }
 
 
         show(
@@ -2508,7 +3265,10 @@ socket.on(
 
 function renderGame() {
 
-    if (!state) {
+    if (
+        !state
+    ) {
+
         return;
     }
 
@@ -2628,7 +3388,10 @@ function renderGame() {
         state.prompt;
 
 
-    if (!prompt) {
+    if (
+        !prompt
+    ) {
+
         return;
     }
 
@@ -2845,6 +3608,7 @@ function renderGame() {
                 <h3>
 
                     🛡️
+
                     ${escapeHtml(
                         prompt.title
                     )}
@@ -2867,7 +3631,6 @@ function renderGame() {
 
 
                     <button
-
                         class="gray"
 
                         onclick="
@@ -2895,7 +3658,7 @@ function renderGame() {
 
 
     // =================================================
-    // 외교관 교환
+    // 외교관
     // =================================================
 
     if (
@@ -2954,6 +3717,7 @@ function renderGame() {
             <h3>
                 🔄 외교관 카드 교환
             </h3>
+
 
             <p>
 
@@ -3058,6 +3822,7 @@ function renderGame() {
                 💀 영향력 상실
             </h3>
 
+
             <p>
 
                 ${escapeHtml(
@@ -3066,11 +3831,13 @@ function renderGame() {
 
             </p>
 
+
             <p class="muted">
 
                 공개할 카드를 선택하세요.
 
             </p>
+
 
             <div class="row">
 
@@ -3092,6 +3859,20 @@ function renderGame() {
         prompt.type ===
         'game_over'
     ) {
+
+        if (
+            !victorySoundPlayed
+        ) {
+
+            victorySoundPlayed =
+                true;
+
+
+            playSfx(
+                'victory'
+            );
+        }
+
 
         showPrompt(`
 
@@ -3208,7 +3989,9 @@ function playerHtml(
 
                                 ${
                                     card.dead
+
                                         ? 'dead'
+
                                         : ''
                                 }
                             "
@@ -3300,19 +4083,25 @@ function playerHtml(
 
                     ${
                         player.isAI
+
                             ? ' 🤖'
+
                             : ''
                     }
 
                     ${
                         player.disconnected
+
                             ? ' 🚪'
+
                             : ''
                     }
 
                     ${
                         isMe
+
                             ? ' (나)'
+
                             : ''
                     }
 
@@ -3341,12 +4130,33 @@ function playerHtml(
 
 
 // =====================================================
-// 행동
+// 행동 선택
 // =====================================================
 
 function chooseAction(
     action
 ) {
+
+    unlockAudio();
+
+
+    if (
+        action ===
+        'exchange'
+    ) {
+
+        playSfx(
+            'exchange'
+        );
+    }
+
+    else {
+
+        playSfx(
+            'action'
+        );
+    }
+
 
     if (
         TARGET_ACTIONS.has(
@@ -3408,7 +4218,9 @@ function chooseAction(
 
                             ${
                                 player.isAI
+
                                     ? ' 🤖'
+
                                     : ''
                             }
 
@@ -3484,6 +4296,11 @@ function sendTarget(
     targetId
 ) {
 
+    playSfx(
+        'action'
+    );
+
+
     socket.emit(
 
         'declare_action',
@@ -3547,6 +4364,23 @@ function challenge(
     value
 ) {
 
+    if (
+        value
+    ) {
+
+        playSfx(
+            'challenge'
+        );
+    }
+
+    else {
+
+        playSfx(
+            'action'
+        );
+    }
+
+
     socket.emit(
 
         'challenge_response',
@@ -3573,6 +4407,16 @@ function respondBlock(
     block,
     role = null
 ) {
+
+    playSfx(
+
+        block
+
+            ? 'block'
+
+            : 'action'
+    );
+
 
     socket.emit(
 
@@ -3627,6 +4471,11 @@ function toggleExchangeCard(
     id,
     keepCount
 ) {
+
+    playSfx(
+        'action'
+    );
+
 
     const element =
 
@@ -3699,6 +4548,11 @@ function submitExchange(
 
         return;
     }
+
+
+    playSfx(
+        'exchange'
+    );
 
 
     socket.emit(
@@ -3814,7 +4668,10 @@ function startChallengeCountdown(
                 (
                     left /
                     1000
-                ).toFixed(1);
+                )
+                    .toFixed(
+                        1
+                    );
         }
 
 
@@ -3977,7 +4834,10 @@ function animateDeal() {
             );
 
 
-    if (!deck) {
+    if (
+        !deck
+    ) {
+
         return;
     }
 
@@ -4036,6 +4896,20 @@ function animateDeal() {
                 );
 
 
+            setTimeout(
+
+                () => {
+
+                    playSfx(
+                        'deal'
+                    );
+                },
+
+                index *
+                130
+            );
+
+
             card.animate(
 
                 [
@@ -4062,7 +4936,8 @@ function animateDeal() {
                         520,
 
                     delay:
-                        index * 130,
+                        index *
+                        130,
 
                     easing:
                         'cubic-bezier(.2,.8,.2,1)',
@@ -4101,7 +4976,10 @@ function animateCoinChanges(
             );
 
 
-        if (!oldPlayer) {
+        if (
+            !oldPlayer
+        ) {
+
             continue;
         }
 
@@ -4136,6 +5014,11 @@ function animateCoins(
     delta
 ) {
 
+    playSfx(
+        'coin'
+    );
+
+
     const bank =
 
         document
@@ -4153,7 +5036,8 @@ function animateCoins(
 
 
     if (
-        !bank ||
+        !bank
+        ||
         !player
     ) {
 
@@ -4210,7 +5094,9 @@ function animateCoins(
     const count =
 
         Math.min(
-            Math.abs(delta),
+            Math.abs(
+                delta
+            ),
             4
         );
 
@@ -4261,20 +5147,25 @@ function animateCoins(
                         transform:
                             'translate(0,0)',
 
-                        opacity: 1
+                        opacity:
+                            1
                     },
 
                     {
                         transform:
                             `translate(${endX - startX}px, ${endY - startY}px)`,
 
-                        opacity: .3
+                        opacity:
+                            .3
                     }
                 ],
 
                 {
-                    duration: 650,
-                    delay: i * 90
+                    duration:
+                        650,
+
+                    delay:
+                        i * 90
                 }
             );
 
@@ -4330,28 +5221,33 @@ function animateCoins(
                     transform:
                         'translateY(10px)',
 
-                    opacity: 0
+                    opacity:
+                        0
                 },
 
                 {
                     transform:
                         'translateY(0)',
 
-                    opacity: 1,
+                    opacity:
+                        1,
 
-                    offset: .25
+                    offset:
+                        .25
                 },
 
                 {
                     transform:
                         'translateY(-25px)',
 
-                    opacity: 0
+                    opacity:
+                        0
                 }
             ],
 
             {
-                duration: 900
+                duration:
+                    900
             }
         );
 
@@ -4387,7 +5283,10 @@ function animateRevealedCards(
             );
 
 
-        if (!old) {
+        if (
+            !old
+        ) {
+
             continue;
         }
 
@@ -4431,35 +5330,38 @@ function animateRevealedCards(
 
                 const element =
 
-                    owner?.querySelector(
-                        `[data-card-index="${index}"]`
-                    );
+                    owner
+                        ?.querySelector(
+                            `[data-card-index="${index}"]`
+                        );
 
 
-                element?.animate(
+                element
+                    ?.animate(
 
-                    [
+                        [
+
+                            {
+                                transform:
+                                    'scale(1)'
+                            },
+
+                            {
+                                transform:
+                                    'scale(1.13) rotate(-5deg)'
+                            },
+
+                            {
+                                transform:
+                                    'scale(1)'
+                            }
+                        ],
 
                         {
-                            transform:
-                                'scale(1)'
-                        },
-
-                        {
-                            transform:
-                                'scale(1.13) rotate(-5deg)'
-                        },
-
-                        {
-                            transform:
-                                'scale(1)'
+                            duration:
+                                520
                         }
-                    ],
-
-                    {
-                        duration: 520
-                    }
-                );
+                    );
             }
         );
     }
@@ -4531,6 +5433,10 @@ async function runVisualQueue() {
 }
 
 
+// =====================================================
+// 시네마틱 열기
+// =====================================================
+
 function openCinematic(
     html,
     redFlash = false
@@ -4544,12 +5450,16 @@ function openCinematic(
             );
 
 
-    document
-        .getElementById(
-            'cinematic-content'
-        )
-        .innerHTML =
-            html;
+    const content =
+
+        document
+            .getElementById(
+                'cinematic-content'
+            );
+
+
+    content.innerHTML =
+        html;
 
 
     overlay.classList.toggle(
@@ -4559,19 +5469,72 @@ function openCinematic(
 
 
     requestAnimationFrame(
+
         () => {
 
-            overlay.classList.add(
-                'show'
-            );
+            overlay
+                .classList
+                .add(
+                    'show'
+                );
         }
     );
 }
 
 
+// =====================================================
+// 시네마틱 강제 초기화
+// =====================================================
+
+function clearCinematic() {
+
+    const overlay =
+
+        document
+            .getElementById(
+                'cinematic-overlay'
+            );
+
+
+    if (
+        overlay
+    ) {
+
+        overlay
+            .classList
+            .remove(
+                'show',
+                'red-flash'
+            );
+    }
+
+
+    const content =
+
+        document
+            .getElementById(
+                'cinematic-content'
+            );
+
+
+    if (
+        content
+    ) {
+
+        content.innerHTML =
+            '';
+    }
+}
+
+
+// =====================================================
+// 시네마틱 닫기
+// =====================================================
+
 function closeCinematic() {
 
     return new Promise(
+
         resolve => {
 
             const overlay =
@@ -4582,25 +5545,18 @@ function closeCinematic() {
                     );
 
 
-            overlay.classList.remove(
-                'show'
-            );
+            overlay
+                .classList
+                .remove(
+                    'show'
+                );
 
 
             setTimeout(
+
                 () => {
 
-                    overlay.classList.remove(
-                        'red-flash'
-                    );
-
-
-                    document
-                        .getElementById(
-                            'cinematic-content'
-                        )
-                        .innerHTML =
-                            '';
+                    clearCinematic();
 
 
                     resolve();
@@ -4614,9 +5570,16 @@ function closeCinematic() {
 }
 
 
-function sleep(ms) {
+// =====================================================
+// 대기 함수
+// =====================================================
+
+function sleep(
+    ms
+) {
 
     return new Promise(
+
         resolve =>
             setTimeout(
                 resolve,
@@ -4634,6 +5597,15 @@ async function playChallengeResult(
     event
 ) {
 
+    if (
+        document.visibilityState !==
+        'visible'
+    ) {
+
+        return;
+    }
+
+
     const image =
         ROLE_IMAGES[
             event.role
@@ -4648,6 +5620,11 @@ async function playChallengeResult(
             ? '🛡️ 방어 도전'
 
             : '⚔️ CHALLENGE';
+
+
+    playSfx(
+        'challenge'
+    );
 
 
     openCinematic(`
@@ -4688,7 +5665,9 @@ async function playChallengeResult(
                 cinematic-card
                 ${
                     event.truthful
+
                         ? ''
+
                         : 'false'
                 }
             "
@@ -4708,7 +5687,9 @@ async function playChallengeResult(
                 cinematic-result
                 ${
                     event.truthful
+
                         ? 'success'
+
                         : 'fail'
                 }
             "
@@ -4727,7 +5708,32 @@ async function playChallengeResult(
 
 
     await sleep(
-        1750
+        350
+    );
+
+
+    playSfx(
+        'reveal'
+    );
+
+
+    await sleep(
+        450
+    );
+
+
+    playSfx(
+
+        event.truthful
+
+            ? 'fail'
+
+            : 'success'
+    );
+
+
+    await sleep(
+        900
     );
 
 
@@ -4736,17 +5742,31 @@ async function playChallengeResult(
 
 
 // =====================================================
-// 사망 연출
+// 영향력 상실 연출
 // =====================================================
 
 async function playInfluenceLost(
     event
 ) {
 
+    if (
+        document.visibilityState !==
+        'visible'
+    ) {
+
+        return;
+    }
+
+
     const image =
         ROLE_IMAGES[
             event.role
         ];
+
+
+    playSfx(
+        'death'
+    );
 
 
     openCinematic(
@@ -4880,6 +5900,10 @@ function escapeHtml(
             '&#039;'
         );
 }
+
+
+// 처음 버튼 상태 표시
+updateSoundButton();
 
 
 </script>
