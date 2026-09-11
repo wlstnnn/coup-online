@@ -110,20 +110,29 @@ const rooms = {};
 
 function shuffle(arr) {
 
-    const a = [...arr];
+    const result = [...arr];
 
-    for (let i = a.length - 1; i > 0; i--) {
+    for (
+        let i = result.length - 1;
+        i > 0;
+        i--
+    ) {
 
         const j =
             Math.floor(
                 Math.random() * (i + 1)
             );
 
-        [a[i], a[j]] =
-            [a[j], a[i]];
+        [
+            result[i],
+            result[j]
+        ] = [
+            result[j],
+            result[i]
+        ];
     }
 
-    return a;
+    return result;
 }
 
 
@@ -147,6 +156,8 @@ function makePlayer(
 
         isAI,
 
+        disconnected: false,
+
         coins: 2,
 
         cards: []
@@ -157,14 +168,18 @@ function makePlayer(
 function aliveCards(player) {
 
     return player.cards.filter(
-        card => !card.dead
+        card =>
+            !card.dead
     );
 }
 
 
 function isAlive(player) {
 
-    return aliveCards(player).length > 0;
+    return (
+        aliveCards(player)
+            .length > 0
+    );
 }
 
 
@@ -237,6 +252,7 @@ function setTopLog(
     room.log =
         text;
 
+
     io.to(
         room.code
     ).emit(
@@ -300,25 +316,41 @@ function lobbyData() {
         Object.entries(rooms)
     ) {
 
+        // 끝난 방은 공개방에서 숨김
+        if (
+            room.closed
+        ) {
+
+            continue;
+        }
+
+
         data[code] = {
 
             isPlaying:
                 room.isPlaying,
 
             players:
-                room.players.map(
-                    player => ({
+                room.players
 
-                        id:
-                            player.id,
+                    .filter(
+                        player =>
+                            !player.disconnected
+                    )
 
-                        name:
-                            player.name,
+                    .map(
+                        player => ({
 
-                        isAI:
-                            player.isAI
-                    })
-                )
+                            id:
+                                player.id,
+
+                            name:
+                                player.name,
+
+                            isAI:
+                                player.isAI
+                        })
+                    )
         };
     }
 
@@ -337,7 +369,7 @@ function broadcastLobby() {
 
 
 // =====================================================
-// 현재 행동의 대상 이름
+// 대상 이름
 // =====================================================
 
 function actionTargetName(
@@ -361,7 +393,7 @@ function actionTargetName(
 
 
 // =====================================================
-// 프롬프트
+// 플레이어별 프롬프트
 // =====================================================
 
 function promptFor(
@@ -369,9 +401,29 @@ function promptFor(
     viewerId
 ) {
 
-    // =============================================
-    // 내 턴
-    // =============================================
+    // =================================================
+    // 게임 종료
+    // =================================================
+
+    if (
+        room.phase ===
+        'game_over'
+    ) {
+
+        return {
+
+            type:
+                'game_over',
+
+            winner:
+                room.winner
+        };
+    }
+
+
+    // =================================================
+    // 행동 선택
+    // =================================================
 
     if (
         room.phase ===
@@ -399,6 +451,7 @@ function promptFor(
                 'wait',
 
             text:
+
                 active?.isAI
 
                     ? `${active.name}이(가) 행동을 고민 중...`
@@ -408,9 +461,9 @@ function promptFor(
     }
 
 
-    // =============================================
+    // =================================================
     // 행동 도전
-    // =============================================
+    // =================================================
 
     if (
         room.phase ===
@@ -464,8 +517,12 @@ function promptFor(
                     '행동에 도전하시겠습니까?',
 
                 message:
-                    `${actor.name}님이 [${def.role}] 역할로 ` +
-                    `${def.name}${target ? ` → ${target}` : ''}을(를) 선언했습니다.`,
+
+                    `${actor.name}님이 ` +
+                    `[${def.role}] 역할로 ` +
+                    `${def.name}` +
+                    `${target ? ` → ${target}` : ''}` +
+                    `을(를) 선언했습니다.`,
 
                 deadline:
                     room.phaseDeadline
@@ -484,9 +541,9 @@ function promptFor(
     }
 
 
-    // =============================================
+    // =================================================
     // 방어
-    // =============================================
+    // =================================================
 
     if (
         room.phase ===
@@ -540,8 +597,10 @@ function promptFor(
                     '방어하시겠습니까?',
 
                 message:
+
                     `${actor.name}님의 ${def.name}` +
-                    `${target ? ` → ${target}` : ''} 행동을 막을 수 있습니다.`,
+                    `${target ? ` → ${target}` : ''}` +
+                    ` 행동을 막을 수 있습니다.`,
 
                 roles:
                     def.blockRoles,
@@ -563,9 +622,9 @@ function promptFor(
     }
 
 
-    // =============================================
-    // 방어에 대한 도전
-    // =============================================
+    // =================================================
+    // 방어 도전
+    // =================================================
 
     if (
         room.phase ===
@@ -606,7 +665,9 @@ function promptFor(
                     '방어에 도전하시겠습니까?',
 
                 message:
-                    `${blocker.name}님이 [${block.role}] 역할로 방어했습니다.`,
+
+                    `${blocker.name}님이 ` +
+                    `[${block.role}] 역할로 방어했습니다.`,
 
                 deadline:
                     room.phaseDeadline
@@ -625,9 +686,9 @@ function promptFor(
     }
 
 
-    // =============================================
+    // =================================================
     // 외교관 교환
-    // =============================================
+    // =================================================
 
     if (
         room.phase ===
@@ -661,6 +722,7 @@ function promptFor(
                 'wait',
 
             text:
+
                 `${getPlayer(
                     room,
                     room.exchange?.playerId
@@ -669,9 +731,9 @@ function promptFor(
     }
 
 
-    // =============================================
+    // =================================================
     // 영향력 상실
-    // =============================================
+    // =================================================
 
     if (
         room.phase ===
@@ -700,30 +762,11 @@ function promptFor(
                 'wait',
 
             text:
+
                 `${getPlayer(
                     room,
                     room.loss.playerId
                 )?.name || '플레이어'}님이 공개할 카드를 고르는 중...`
-        };
-    }
-
-
-    // =============================================
-    // 게임 종료
-    // =============================================
-
-    if (
-        room.phase ===
-        'game_over'
-    ) {
-
-        return {
-
-            type:
-                'game_over',
-
-            winner:
-                room.winner
         };
     }
 
@@ -740,7 +783,7 @@ function promptFor(
 
 
 // =====================================================
-// 클라이언트에 보낼 상태
+// 클라이언트 상태
 // =====================================================
 
 function stateFor(
@@ -780,6 +823,9 @@ function stateFor(
 
                     isAI:
                         player.isAI,
+
+                    disconnected:
+                        player.disconnected,
 
                     coins:
                         player.coins,
@@ -829,6 +875,8 @@ function emitState(room) {
 
         if (
             player.isAI
+            ||
+            player.disconnected
         ) {
 
             continue;
@@ -859,15 +907,16 @@ function emitState(room) {
 
 function checkWinner(room) {
 
-    const alive =
+    const living =
 
         room.players.filter(
-            isAlive
+            player =>
+                isAlive(player)
         );
 
 
     if (
-        alive.length !== 1
+        living.length !== 1
     ) {
 
         return false;
@@ -887,15 +936,20 @@ function checkWinner(room) {
         false;
 
 
+    // 공개방에서 제거
+    room.closed =
+        true;
+
+
     room.winner =
-        alive[0].name;
+        living[0].name;
 
 
     addHistory(
 
         room,
 
-        `🏆 ${alive[0].name}님이 승리했습니다!`,
+        `🏆 ${living[0].name}님이 승리했습니다!`,
 
         'result'
     );
@@ -945,6 +999,10 @@ function nextTurn(room) {
         null;
 
 
+    let safety =
+        0;
+
+
     do {
 
         room.turnIdx =
@@ -956,6 +1014,18 @@ function nextTurn(room) {
             %
 
             room.players.length;
+
+
+        safety++;
+
+
+        if (
+            safety >
+            room.players.length + 2
+        ) {
+
+            return;
+        }
 
     }
 
@@ -1049,7 +1119,7 @@ function continueAfterLoss(
 
 
 // =====================================================
-// 영향력 1개 잃기
+// 영향력 상실
 // =====================================================
 
 function loseInfluence(
@@ -1072,9 +1142,7 @@ function loseInfluence(
 
 
     const alive =
-        aliveCards(
-            player
-        );
+        aliveCards(player);
 
 
     if (
@@ -1090,8 +1158,7 @@ function loseInfluence(
     }
 
 
-    // AI 또는 카드가 1장뿐인 경우 자동 선택
-
+    // AI 또는 카드 한 장 남음
     if (
         player.isAI
         ||
@@ -1115,16 +1182,31 @@ function loseInfluence(
         card.dead =
             true;
 
-        io.to(room.code).emit(
-    'visual_event',
-    {
-        type: 'influence_lost',
-        playerId: player.id,
-        playerName: player.name,
-        role: card.role,
-        eliminated: !isAlive(player)
-    }
-);
+
+        // 사망 연출
+        io.to(
+            room.code
+        ).emit(
+
+            'visual_event',
+
+            {
+                type:
+                    'influence_lost',
+
+                playerId:
+                    player.id,
+
+                playerName:
+                    player.name,
+
+                role:
+                    card.role,
+
+                eliminated:
+                    !isAlive(player)
+            }
+        );
 
 
         addHistory(
@@ -1147,8 +1229,7 @@ function loseInfluence(
     }
 
 
-    // 사람이고 카드가 2장이면 직접 선택
-
+    // 직접 선택
     room.phase =
         'lose';
 
@@ -1178,7 +1259,7 @@ function loseInfluence(
 
 
 // =====================================================
-// 역할 증명 후 카드 교체
+// 역할 증명 후 교체
 // =====================================================
 
 function replaceShownRole(
@@ -1199,7 +1280,9 @@ function replaceShownRole(
 
             card =>
                 !card.dead
+
                 &&
+
                 card.role ===
                 role
         );
@@ -1254,6 +1337,7 @@ function eligibleBlockers(room) {
         ];
 
 
+    // 암살 / 약탈
     if (
         def.blockScope ===
         'target'
@@ -1267,7 +1351,8 @@ function eligibleBlockers(room) {
 
 
         if (
-            target &&
+            target
+            &&
             isAlive(target)
         ) {
 
@@ -1281,6 +1366,7 @@ function eligibleBlockers(room) {
     }
 
 
+    // 외부 지원
     if (
         def.blockScope ===
         'any'
@@ -1324,7 +1410,9 @@ function continueAfterActionChallenge(
         )
     ) {
 
-        startBlockPhase(room);
+        startBlockPhase(
+            room
+        );
 
         return;
     }
@@ -1335,7 +1423,7 @@ function continueAfterActionChallenge(
 
 
 // =====================================================
-// 외교관 교환 시작
+// 외교관 교환
 // =====================================================
 
 function startExchange(room) {
@@ -1353,7 +1441,8 @@ function startExchange(room) {
 
 
     if (
-        !player ||
+        !player
+        ||
         !isAlive(player)
     ) {
 
@@ -1368,7 +1457,10 @@ function startExchange(room) {
 
 
     player.cards.forEach(
-        (card, index) => {
+        (
+            card,
+            index
+        ) => {
 
             if (
                 !card.dead
@@ -1386,6 +1478,7 @@ function startExchange(room) {
         [];
 
 
+    // 기존 살아있는 카드
     liveIndices.forEach(
         index => {
 
@@ -1403,6 +1496,7 @@ function startExchange(room) {
     );
 
 
+    // 덱에서 2장
     for (
         let i = 0;
         i < 2 && room.deck.length;
@@ -1452,10 +1546,6 @@ function startExchange(room) {
 }
 
 
-// =====================================================
-// 외교관 교환 완료
-// =====================================================
-
 function completeExchange(
     room,
     playerId,
@@ -1495,9 +1585,11 @@ function completeExchange(
 
 
     const unique =
-        [...new Set(
-            selectedIds
-        )];
+        [
+            ...new Set(
+                selectedIds
+            )
+        ];
 
 
     if (
@@ -1523,7 +1615,8 @@ function completeExchange(
 
     if (
         selected.some(
-            card => !card
+            card =>
+                !card
         )
     ) {
 
@@ -1546,6 +1639,7 @@ function completeExchange(
         );
 
 
+    // 선택 안 한 카드는 덱으로 반환
     const returned =
 
         exchange.candidates.filter(
@@ -1567,13 +1661,19 @@ function completeExchange(
     );
 
 
+    // 살아있는 카드 자리 교체
     exchange.liveIndices.forEach(
-        (cardIndex, i) => {
+        (
+            cardIndex,
+            index
+        ) => {
 
             player.cards[
                 cardIndex
             ].role =
-                selectedRoles[i];
+                selectedRoles[
+                    index
+                ];
         }
     );
 
@@ -1599,6 +1699,7 @@ function completeExchange(
 
 
     nextTurn(room);
+
 
     return true;
 }
@@ -1721,7 +1822,8 @@ function resolveAction(room) {
         case 'steal': {
 
             if (
-                !target ||
+                !target
+                ||
                 !isAlive(target)
             ) {
 
@@ -1766,7 +1868,8 @@ function resolveAction(room) {
         case 'coup':
 
             if (
-                !target ||
+                !target
+                ||
                 !isAlive(target)
             ) {
 
@@ -1804,7 +1907,8 @@ function resolveAction(room) {
         case 'assassinate':
 
             if (
-                !target ||
+                !target
+                ||
                 !isAlive(target)
             ) {
 
@@ -1924,6 +2028,7 @@ function startActionChallenge(room) {
                 finishActionChallenge(
                     room
                 );
+
             },
 
             RESPONSE_MS
@@ -2133,17 +2238,33 @@ function resolveActionChallenge(
             'result'
         );
 
-        io.to(room.code).emit(
-    'visual_event',
-    {
-        type: 'challenge_result',
-        context: 'action',
-        truthful: true,
-        actorName: actor.name,
-        challengerName: challenger.name,
-        role: role
-    }
-);
+
+        // 도전 결과 연출
+        io.to(
+            room.code
+        ).emit(
+
+            'visual_event',
+
+            {
+                type:
+                    'challenge_result',
+
+                context:
+                    'action',
+
+                truthful:
+                    true,
+
+                actorName:
+                    actor.name,
+
+                challengerName:
+                    challenger.name,
+
+                role
+            }
+        );
 
 
         replaceShownRole(
@@ -2179,17 +2300,32 @@ function resolveActionChallenge(
             'result'
         );
 
-        io.to(room.code).emit(
-    'visual_event',
-    {
-        type: 'challenge_result',
-        context: 'action',
-        truthful: false,
-        actorName: actor.name,
-        challengerName: challenger.name,
-        role: role
-    }
-);
+
+        io.to(
+            room.code
+        ).emit(
+
+            'visual_event',
+
+            {
+                type:
+                    'challenge_result',
+
+                context:
+                    'action',
+
+                truthful:
+                    false,
+
+                actorName:
+                    actor.name,
+
+                challengerName:
+                    challenger.name,
+
+                role
+            }
+        );
 
 
         loseInfluence(
@@ -2275,6 +2411,7 @@ function startBlockPhase(room) {
                 finishBlockPhase(
                     room
                 );
+
             },
 
             RESPONSE_MS
@@ -2493,6 +2630,7 @@ function claimBlock(
                 finishBlockChallenge(
                     room
                 );
+
             },
 
             RESPONSE_MS
@@ -2500,6 +2638,7 @@ function claimBlock(
 
 
     emitState(room);
+
 
     return true;
 }
@@ -2713,17 +2852,33 @@ function resolveBlockChallenge(
             'result'
         );
 
-        io.to(room.code).emit(
-    'visual_event',
-    {
-        type: 'challenge_result',
-        context: 'block',
-        truthful: true,
-        actorName: blocker.name,
-        challengerName: challenger.name,
-        role: block.role
-    }
-);
+
+        io.to(
+            room.code
+        ).emit(
+
+            'visual_event',
+
+            {
+                type:
+                    'challenge_result',
+
+                context:
+                    'block',
+
+                truthful:
+                    true,
+
+                actorName:
+                    blocker.name,
+
+                challengerName:
+                    challenger.name,
+
+                role:
+                    block.role
+            }
+        );
 
 
         replaceShownRole(
@@ -2759,17 +2914,33 @@ function resolveBlockChallenge(
             'result'
         );
 
-        io.to(room.code).emit(
-    'visual_event',
-    {
-        type: 'challenge_result',
-        context: 'block',
-        truthful: false,
-        actorName: blocker.name,
-        challengerName: challenger.name,
-        role: block.role
-    }
-);
+
+        io.to(
+            room.code
+        ).emit(
+
+            'visual_event',
+
+            {
+                type:
+                    'challenge_result',
+
+                context:
+                    'block',
+
+                truthful:
+                    false,
+
+                actorName:
+                    blocker.name,
+
+                challengerName:
+                    challenger.name,
+
+                role:
+                    block.role
+            }
+        );
 
 
         loseInfluence(
@@ -2815,6 +2986,10 @@ function declareAction(
 
         ||
 
+        room.closed
+
+        ||
+
         room.phase !==
         'action'
 
@@ -2840,8 +3015,7 @@ function declareAction(
     }
 
 
-    // 10코인 이상이면 강제 쿠데타
-
+    // 10코인이면 쿠데타 강제
     if (
         actor.coins >= 10
 
@@ -2898,7 +3072,6 @@ function declareAction(
 
 
     // 비용 선지불
-
     actor.coins -=
         def.cost;
 
@@ -2979,6 +3152,386 @@ function declareAction(
 
 
 // =====================================================
+// 사람이 나갔을 때 게임 상태 정리
+// =====================================================
+
+function resetTurnAfterDeparture(
+    room,
+    leavingId
+) {
+
+    clearAllTimers(
+        room
+    );
+
+
+    // 진행 중 행동이 있었다면
+    // 현재 행동을 취소.
+    // 비용 행동이면 살아있는 행동자에게 비용 반환.
+    if (
+        room.pendingAction
+    ) {
+
+        const action =
+            room.pendingAction;
+
+
+        const actor =
+            getPlayer(
+                room,
+                action.actorId
+            );
+
+
+        const def =
+            ACTIONS[
+                action.action
+            ];
+
+
+        if (
+            actor
+
+            &&
+
+            actor.id !==
+            leavingId
+
+            &&
+
+            isAlive(actor)
+
+            &&
+
+            def?.cost > 0
+        ) {
+
+            actor.coins +=
+                def.cost;
+
+
+            addHistory(
+
+                room,
+
+                `↩️ 플레이어 이탈로 ${actor.name}님의 진행 중 행동이 취소되어 ${def.cost}코인을 반환했습니다.`,
+
+                'info'
+            );
+        }
+    }
+
+
+    room.pendingAction =
+        null;
+
+
+    room.pendingBlock =
+        null;
+
+
+    room.exchange =
+        null;
+
+
+    room.loss =
+        null;
+
+
+    let active =
+        currentPlayer(room);
+
+
+    // 현재 턴 플레이어가 나간 경우
+    // 다음 생존자로 이동
+    if (
+        !active
+
+        ||
+
+        !isAlive(active)
+
+        ||
+
+        active.id ===
+        leavingId
+    ) {
+
+        let safety =
+            0;
+
+
+        do {
+
+            room.turnIdx =
+
+                (
+                    room.turnIdx + 1
+                )
+
+                %
+
+                room.players.length;
+
+
+            safety++;
+
+
+            if (
+                safety >
+                room.players.length + 2
+            ) {
+
+                return;
+            }
+
+        }
+
+        while (
+            !isAlive(
+                currentPlayer(room)
+            )
+        );
+    }
+
+
+    room.phase =
+        'action';
+
+
+    addHistory(
+
+        room,
+
+        `▶ ${currentPlayer(room).name}님의 턴`,
+
+        'turn'
+    );
+
+
+    emitState(room);
+}
+
+
+// =====================================================
+// 플레이어 나가기
+// =====================================================
+
+function removePlayerFromRoom(
+    socketId,
+    requestedRoomCode = null
+) {
+
+    let roomCode =
+        requestedRoomCode;
+
+
+    // 방코드가 없으면
+    // socketId로 방 탐색
+    if (
+        !roomCode
+    ) {
+
+        for (
+            const [code, room]
+            of
+            Object.entries(rooms)
+        ) {
+
+            if (
+                room.players.some(
+                    player =>
+                        player.id ===
+                        socketId
+                )
+            ) {
+
+                roomCode =
+                    code;
+
+                break;
+            }
+        }
+    }
+
+
+    if (
+        !roomCode
+    ) {
+
+        return;
+    }
+
+
+    roomCode =
+        String(
+            roomCode
+        ).toUpperCase();
+
+
+    const room =
+        rooms[
+            roomCode
+        ];
+
+
+    if (!room) {
+        return;
+    }
+
+
+    const player =
+        room.players.find(
+            player =>
+                player.id ===
+                socketId
+        );
+
+
+    if (!player) {
+        return;
+    }
+
+
+    // =================================================
+    // 게임 중 이탈
+    // =================================================
+
+    if (
+        room.isPlaying
+
+        &&
+
+        isAlive(player)
+    ) {
+
+        player.disconnected =
+            true;
+
+
+        // 모든 남은 영향력 상실
+        player.cards.forEach(
+            card => {
+
+                if (
+                    !card.dead
+                ) {
+
+                    card.dead =
+                        true;
+                }
+            }
+        );
+
+
+        addHistory(
+
+            room,
+
+            `🚪 ${player.name}님이 게임에서 나가 탈락했습니다.`,
+
+            'loss'
+        );
+
+
+        // 1명 남으면 즉시 승리
+        if (
+            checkWinner(room)
+        ) {
+
+            return;
+        }
+
+
+        // 게임 계속
+        resetTurnAfterDeparture(
+
+            room,
+
+            socketId
+        );
+
+
+        broadcastLobby();
+
+        return;
+    }
+
+
+    // =================================================
+    // 대기실 또는 이미 끝난 방
+    // =================================================
+
+    room.players =
+
+        room.players.filter(
+            player =>
+                player.id !==
+                socketId
+        );
+
+
+    // 방장 변경
+    if (
+        room.hostId ===
+        socketId
+    ) {
+
+        const nextHost =
+
+            room.players.find(
+                player =>
+                    !player.isAI
+
+                    &&
+
+                    !player.disconnected
+            );
+
+
+        room.hostId =
+            nextHost?.id ||
+            null;
+    }
+
+
+    // =================================================
+    // 실제 사람이 없으면 방 완전 삭제
+    // =================================================
+
+    const hasHuman =
+
+        room.players.some(
+
+            player =>
+                !player.isAI
+
+                &&
+
+                !player.disconnected
+        );
+
+
+    if (
+        !hasHuman
+    ) {
+
+        clearAllTimers(
+            room
+        );
+
+
+        delete rooms[
+            roomCode
+        ];
+    }
+
+
+    broadcastLobby();
+}
+
+
+// =====================================================
 // AI
 // =====================================================
 
@@ -2991,15 +3544,17 @@ function runAI(room) {
 
     if (
         !room.isPlaying
+        ||
+        room.closed
     ) {
 
         return;
     }
 
 
-    // =============================================
-    // AI 자기 턴
-    // =============================================
+    // =================================================
+    // AI 턴
+    // =================================================
 
     if (
         room.phase ===
@@ -3071,8 +3626,7 @@ function runAI(room) {
 
                         &&
 
-                        Math.random() <
-                        0.55
+                        Math.random() < .55
                     ) {
 
                         action =
@@ -3113,7 +3667,9 @@ function runAI(room) {
 
                     const target =
 
-                        ACTIONS[action].target
+                        ACTIONS[
+                            action
+                        ].target
 
                             ? targets[
                                 Math.floor(
@@ -3140,7 +3696,8 @@ function runAI(room) {
 
                 1400 +
                 Math.floor(
-                    Math.random() * 1000
+                    Math.random() *
+                    1000
                 )
             );
 
@@ -3149,9 +3706,9 @@ function runAI(room) {
     }
 
 
-    // =============================================
+    // =================================================
     // AI 행동 도전
-    // =============================================
+    // =================================================
 
     if (
         room.phase ===
@@ -3166,17 +3723,25 @@ function runAI(room) {
 
             action.challengeIds.find(
 
-                id =>
-                    getPlayer(
-                        room,
-                        id
-                    )?.isAI
+                id => {
 
-                    &&
+                    const player =
+                        getPlayer(
+                            room,
+                            id
+                        );
 
-                    !action.passedIds.includes(
-                        id
-                    )
+
+                    return (
+                        player?.isAI
+
+                        &&
+
+                        !action.passedIds.includes(
+                            id
+                        )
+                    );
+                }
             );
 
 
@@ -3205,7 +3770,7 @@ function runAI(room) {
 
                     if (
                         Math.random() <
-                        0.18
+                        .18
                     ) {
 
                         resolveActionChallenge(
@@ -3230,7 +3795,8 @@ function runAI(room) {
 
                 5400 +
                 Math.floor(
-                    Math.random() * 900
+                    Math.random() *
+                    900
                 )
             );
 
@@ -3239,9 +3805,9 @@ function runAI(room) {
     }
 
 
-    // =============================================
+    // =================================================
     // AI 방어
-    // =============================================
+    // =================================================
 
     if (
         room.phase ===
@@ -3256,17 +3822,25 @@ function runAI(room) {
 
             action.blockIds.find(
 
-                id =>
-                    getPlayer(
-                        room,
-                        id
-                    )?.isAI
+                id => {
 
-                    &&
+                    const player =
+                        getPlayer(
+                            room,
+                            id
+                        );
 
-                    !action.blockPassedIds.includes(
-                        id
-                    )
+
+                    return (
+                        player?.isAI
+
+                        &&
+
+                        !action.blockPassedIds.includes(
+                            id
+                        )
+                    );
+                }
             );
 
 
@@ -3324,28 +3898,28 @@ function runAI(room) {
                         );
 
 
-                    let block = false;
+                    let willBlock;
 
 
                     if (
                         realRoles.length
                     ) {
 
-                        block =
+                        willBlock =
                             Math.random() <
-                            0.78;
+                            .78;
                     }
 
                     else {
 
-                        block =
+                        willBlock =
                             Math.random() <
-                            0.16;
+                            .16;
                     }
 
 
                     if (
-                        block
+                        willBlock
                     ) {
 
                         const role =
@@ -3391,7 +3965,8 @@ function runAI(room) {
 
                 3000 +
                 Math.floor(
-                    Math.random() * 1100
+                    Math.random() *
+                    1100
                 )
             );
 
@@ -3400,9 +3975,9 @@ function runAI(room) {
     }
 
 
-    // =============================================
-    // AI가 방어를 도전
-    // =============================================
+    // =================================================
+    // AI 방어 도전
+    // =================================================
 
     if (
         room.phase ===
@@ -3417,17 +3992,25 @@ function runAI(room) {
 
             block.challengeIds.find(
 
-                id =>
-                    getPlayer(
-                        room,
-                        id
-                    )?.isAI
+                id => {
 
-                    &&
+                    const player =
+                        getPlayer(
+                            room,
+                            id
+                        );
 
-                    !block.passedIds.includes(
-                        id
-                    )
+
+                    return (
+                        player?.isAI
+
+                        &&
+
+                        !block.passedIds.includes(
+                            id
+                        )
+                    );
+                }
             );
 
 
@@ -3456,7 +4039,7 @@ function runAI(room) {
 
                     if (
                         Math.random() <
-                        0.18
+                        .18
                     ) {
 
                         resolveBlockChallenge(
@@ -3481,7 +4064,8 @@ function runAI(room) {
 
                 5400 +
                 Math.floor(
-                    Math.random() * 900
+                    Math.random() *
+                    900
                 )
             );
 
@@ -3490,9 +4074,9 @@ function runAI(room) {
     }
 
 
-    // =============================================
+    // =================================================
     // AI 외교관 교환
-    // =============================================
+    // =================================================
 
     if (
         room.phase ===
@@ -3574,7 +4158,7 @@ function runAI(room) {
 
 
 // =====================================================
-// Socket.IO
+// SOCKET.IO
 // =====================================================
 
 io.on(
@@ -3607,9 +4191,9 @@ io.on(
         );
 
 
-        // =============================================
+        // =================================================
         // 방 생성
-        // =============================================
+        // =================================================
 
         socket.on(
 
@@ -3646,6 +4230,7 @@ io.on(
                         roomCode,
 
                     players: [
+
                         makePlayer(
                             socket.id,
                             nickname
@@ -3656,6 +4241,9 @@ io.on(
                         [],
 
                     isPlaying:
+                        false,
+
+                    closed:
                         false,
 
                     phase:
@@ -3725,9 +4313,9 @@ io.on(
         );
 
 
-        // =============================================
-        // 입장
-        // =============================================
+        // =================================================
+        // 참가
+        // =================================================
 
         socket.on(
 
@@ -3755,6 +4343,8 @@ io.on(
 
                 if (
                     !room
+                    ||
+                    room.closed
                 ) {
 
                     socket.emit(
@@ -3783,8 +4373,16 @@ io.on(
                 }
 
 
+                const activePlayers =
+
+                    room.players.filter(
+                        player =>
+                            !player.disconnected
+                    );
+
+
                 if (
-                    room.players.length >= 5
+                    activePlayers.length >= 5
                 ) {
 
                     socket.emit(
@@ -3834,9 +4432,9 @@ io.on(
         );
 
 
-        // =============================================
+        // =================================================
         // AI 추가
-        // =============================================
+        // =================================================
 
         socket.on(
 
@@ -3855,6 +4453,10 @@ io.on(
 
                 if (
                     !room
+
+                    ||
+
+                    room.closed
 
                     ||
 
@@ -3936,9 +4538,9 @@ io.on(
         );
 
 
-        // =============================================
+        // =================================================
         // 게임 시작
-        // =============================================
+        // =================================================
 
         socket.on(
 
@@ -3955,7 +4557,12 @@ io.on(
                     ];
 
 
-                if (!room) {
+                if (
+                    !room
+                    ||
+                    room.closed
+                ) {
+
                     return;
                 }
 
@@ -4001,6 +4608,10 @@ io.on(
                     true;
 
 
+                room.closed =
+                    false;
+
+
                 room.phase =
                     'action';
 
@@ -4034,8 +4645,11 @@ io.on(
 
 
                 room.players.forEach(
-
                     player => {
+
+                        player.disconnected =
+                            false;
+
 
                         player.coins =
                             2;
@@ -4044,7 +4658,6 @@ io.on(
                         player.cards = [
 
                             {
-
                                 role:
                                     room.deck.pop(),
 
@@ -4053,7 +4666,6 @@ io.on(
                             },
 
                             {
-
                                 role:
                                     room.deck.pop(),
 
@@ -4082,9 +4694,9 @@ io.on(
         );
 
 
-        // =============================================
+        // =================================================
         // 행동
-        // =============================================
+        // =================================================
 
         socket.on(
 
@@ -4110,7 +4722,7 @@ io.on(
                 }
 
 
-                const ok =
+                const success =
 
                     declareAction(
 
@@ -4125,23 +4737,23 @@ io.on(
 
 
                 if (
-                    !ok
+                    !success
                 ) {
 
                     socket.emit(
 
                         'error_msg',
 
-                        '지금은 그 행동을 할 수 없습니다. 코인과 턴을 확인해주세요.'
+                        '지금은 그 행동을 할 수 없습니다. 턴과 코인을 확인해주세요.'
                     );
                 }
             }
         );
 
 
-        // =============================================
-        // 도전 / 통과
-        // =============================================
+        // =================================================
+        // 도전
+        // =================================================
 
         socket.on(
 
@@ -4229,9 +4841,9 @@ io.on(
         );
 
 
-        // =============================================
+        // =================================================
         // 방어
-        // =============================================
+        // =================================================
 
         socket.on(
 
@@ -4269,7 +4881,7 @@ io.on(
                     block
                 ) {
 
-                    const ok =
+                    const success =
 
                         claimBlock(
 
@@ -4282,7 +4894,7 @@ io.on(
 
 
                     if (
-                        !ok
+                        !success
                     ) {
 
                         socket.emit(
@@ -4307,9 +4919,9 @@ io.on(
         );
 
 
-        // =============================================
-        // 외교관 카드 교환
-        // =============================================
+        // =================================================
+        // 외교관 교환
+        // =================================================
 
         socket.on(
 
@@ -4334,7 +4946,7 @@ io.on(
                 }
 
 
-                const ok =
+                const success =
 
                     completeExchange(
 
@@ -4347,7 +4959,7 @@ io.on(
 
 
                 if (
-                    !ok
+                    !success
                 ) {
 
                     socket.emit(
@@ -4361,9 +4973,9 @@ io.on(
         );
 
 
-        // =============================================
-        // 영향력 잃을 카드 선택
-        // =============================================
+        // =================================================
+        // 영향력 상실 카드 선택
+        // =================================================
 
         socket.on(
 
@@ -4415,7 +5027,10 @@ io.on(
 
 
                 if (
-                    !card ||
+                    !card
+
+                    ||
+
                     card.dead
                 ) {
 
@@ -4425,17 +5040,32 @@ io.on(
 
                 card.dead =
                     true;
-                    
-                io.to(room.code).emit(
-    'visual_event',
-    {
-        type: 'influence_lost',
-        playerId: player.id,
-        playerName: player.name,
-        role: card.role,
-        eliminated: !isAlive(player)
-    }
-);
+
+
+                // 카드 사망 연출
+                io.to(
+                    room.code
+                ).emit(
+
+                    'visual_event',
+
+                    {
+                        type:
+                            'influence_lost',
+
+                        playerId:
+                            player.id,
+
+                        playerName:
+                            player.name,
+
+                        role:
+                            card.role,
+
+                        eliminated:
+                            !isAlive(player)
+                    }
+                );
 
 
                 const next =
@@ -4462,9 +5092,46 @@ io.on(
         );
 
 
-        // =============================================
-        // 접속 종료
-        // =============================================
+        // =================================================
+        // 직접 나가기
+        // =================================================
+
+        socket.on(
+
+            'leave_room',
+
+            roomCode => {
+
+                const code =
+
+                    String(
+                        roomCode || ''
+                    ).toUpperCase();
+
+
+                removePlayerFromRoom(
+
+                    socket.id,
+
+                    code
+                );
+
+
+                socket.leave(
+                    code
+                );
+
+
+                socket.emit(
+                    'left_room'
+                );
+            }
+        );
+
+
+        // =================================================
+        // 새로고침 / 브라우저 닫기 / 인터넷 끊김
+        // =================================================
 
         socket.on(
 
@@ -4472,74 +5139,9 @@ io.on(
 
             () => {
 
-                for (
-                    const [code, room]
-                    of
-                    Object.entries(
-                        rooms
-                    )
-                ) {
-
-                    const index =
-
-                        room.players.findIndex(
-
-                            player =>
-                                player.id ===
-                                socket.id
-                        );
-
-
-                    if (
-                        index < 0
-                    ) {
-
-                        continue;
-                    }
-
-
-                    if (
-                        !room.isPlaying
-                    ) {
-
-                        room.players.splice(
-                            index,
-                            1
-                        );
-
-
-                        if (
-                            room.hostId ===
-                            socket.id
-                        ) {
-
-                            const human =
-
-                                room.players.find(
-                                    player =>
-                                        !player.isAI
-                                );
-
-
-                            room.hostId =
-                                human?.id ||
-                                null;
-                        }
-
-
-                        if (
-                            !room.players.length
-                        ) {
-
-                            delete rooms[
-                                code
-                            ];
-                        }
-                    }
-                }
-
-
-                broadcastLobby();
+                removePlayerFromRoom(
+                    socket.id
+                );
             }
         );
     }
@@ -4550,12 +5152,18 @@ io.on(
 // 서버 실행
 // =====================================================
 
-const PORT = process.env.PORT || 3000;
+const PORT =
+    process.env.PORT ||
+    3000;
+
 
 server.listen(
     PORT,
     '0.0.0.0',
     () => {
-        console.log(`COUP 서버 실행 중 - PORT ${PORT}`);
+
+        console.log(
+            `COUP 서버 실행 중 - PORT ${PORT}`
+        );
     }
 );

@@ -14,6 +14,7 @@
 
 <script src="/socket.io/socket.io.js"></script>
 
+
 <style>
 
 * {
@@ -56,7 +57,6 @@ input {
 
 button {
     border: 0;
-
     border-radius: 8px;
 
     padding: 10px 13px;
@@ -64,7 +64,6 @@ button {
     font-weight: 800;
 
     background: #ef4444;
-
     color: white;
 
     cursor: pointer;
@@ -95,9 +94,7 @@ button.gray {
 
 button:disabled {
     opacity: .42;
-
     cursor: default;
-
     transform: none;
 }
 
@@ -112,9 +109,7 @@ input {
         1px solid
         #3f3f46;
 
-    background:
-        #27272a;
-
+    background: #27272a;
     color: white;
 
     margin:
@@ -123,7 +118,6 @@ input {
 
 .screen {
     max-width: 850px;
-
     margin: auto;
 }
 
@@ -171,15 +165,12 @@ p {
 
 .row {
     display: flex;
-
     gap: 8px;
-
     flex-wrap: wrap;
 }
 
 .row button {
     flex: 1;
-
     min-width: 120px;
 }
 
@@ -223,13 +214,11 @@ p {
 
 #wait-room {
     display: none;
-
     max-width: 500px;
 }
 
 #waiting-list {
     padding-left: 22px;
-
     line-height: 1.8;
 }
 
@@ -239,19 +228,22 @@ p {
 /* ================================================= */
 
 #game-screen {
-    width: min(
-        1500px,
-        100%
-    );
+    width:
+        min(
+            1500px,
+            100%
+        );
 
     height:
         calc(
             100vh - 24px
         );
 
-    margin: 0 auto;
+    margin:
+        0 auto;
 
-    display: none;
+    display:
+        none;
 
     grid-template-columns:
         minmax(0, 1fr)
@@ -274,13 +266,11 @@ p {
 
 
 /* ================================================= */
-/* 상단 상태 */
+/* 상단 */
 /* ================================================= */
 
 .game-status {
     grid-area: status;
-
-    min-height: 0;
 }
 
 .status-main {
@@ -289,20 +279,18 @@ p {
     display: grid;
 
     grid-template-columns:
-        1fr auto;
+        minmax(0, 1fr)
+        auto;
 
     align-items: center;
 
-    gap: 20px;
+    gap: 16px;
 }
 
 #log-msg {
-    min-width: 0;
-
     text-align: center;
 
     font-size: 18px;
-
     font-weight: 900;
 
     line-height: 1.4;
@@ -313,14 +301,12 @@ p {
 
     align-items: center;
 
-    gap: 15px;
+    gap: 10px;
 }
 
 #deck-pile {
     width: 54px;
     height: 72px;
-
-    flex-shrink: 0;
 
     border:
         2px solid
@@ -360,7 +346,8 @@ p {
     padding:
         10px 12px;
 
-    border-radius: 999px;
+    border-radius:
+        999px;
 
     background: #27272a;
 
@@ -373,7 +360,7 @@ p {
 
 
 /* ================================================= */
-/* 상대 영역 */
+/* 상대 플레이어 */
 /* ================================================= */
 
 .game-table {
@@ -396,8 +383,6 @@ p {
     font-weight: 900;
 
     margin-bottom: 8px;
-
-    letter-spacing: .5px;
 }
 
 #opponents {
@@ -429,8 +414,7 @@ p {
 /* ================================================= */
 
 .player {
-    background:
-        #111114;
+    background: #111114;
 
     border:
         1px solid
@@ -460,14 +444,12 @@ p {
         );
 }
 
-.opponent-player {
-    margin: 0;
+.player.disconnected {
+    opacity: .4;
 }
 
 .head {
     display: flex;
-
-    align-items: center;
 
     justify-content: space-between;
 
@@ -484,8 +466,6 @@ p {
     gap: 8px;
 
     flex-wrap: wrap;
-
-    align-items: flex-start;
 }
 
 
@@ -496,8 +476,7 @@ p {
 .card {
     width: 118px;
 
-    aspect-ratio:
-        2 / 3;
+    aspect-ratio: 2 / 3;
 
     position: relative;
 
@@ -522,11 +501,11 @@ p {
 }
 
 .card.image-card {
-    background: #111114;
-
     border:
         1px solid
         #52525b;
+
+    background: #111114;
 
     box-shadow:
         0 5px 14px
@@ -539,10 +518,10 @@ p {
 }
 
 .card.image-card img {
-    display: block;
-
     width: 100%;
     height: 100%;
+
+    display: block;
 
     object-fit: cover;
 
@@ -571,14 +550,12 @@ p {
 
 
 /* ================================================= */
-/* 카드 툴팁 */
+/* 툴팁 */
 /* ================================================= */
 
 .card[data-tooltip]::after {
     content:
-        attr(
-            data-tooltip
-        );
+        attr(data-tooltip);
 
     position: absolute;
 
@@ -615,38 +592,23 @@ p {
     color: white;
 
     font-size: 12px;
-
     font-weight: 700;
-
     line-height: 1.5;
 
     text-align: center;
 
-    box-shadow:
-        0 8px 25px
-        rgba(
-            0,
-            0,
-            0,
-            .65
-        );
-
     opacity: 0;
-
     visibility: hidden;
 
     pointer-events: none;
 
-    transition:
-        opacity .18s ease,
-        transform .18s ease;
+    transition: .18s ease;
 
     z-index: 100;
 }
 
 .card[data-tooltip]:hover::after {
     opacity: 1;
-
     visibility: visible;
 
     transform:
@@ -669,9 +631,8 @@ p {
     background:
         radial-gradient(
             circle at center,
-            #27272a 0%,
-            #18181b 60%,
-            #09090b 100%
+            #27272a,
+            #09090b
         );
 
     display: flex;
@@ -679,15 +640,6 @@ p {
     align-items: center;
 
     justify-content: center;
-
-    box-shadow:
-        0 5px 14px
-        rgba(
-            0,
-            0,
-            0,
-            .45
-        );
 }
 
 .card.hidden::before {
@@ -699,8 +651,7 @@ p {
         1px solid
         #d4af37;
 
-    padding:
-        7px 5px;
+    padding: 7px;
 
     border-radius: 5px;
 
@@ -731,8 +682,7 @@ p {
 }
 
 .card.dead::before {
-    content:
-        "✕ 공개됨";
+    content: "✕ 공개됨";
 
     position: absolute;
 
@@ -745,8 +695,7 @@ p {
 
     z-index: 10;
 
-    padding:
-        5px 7px;
+    padding: 5px 7px;
 
     border:
         2px solid
@@ -765,7 +714,6 @@ p {
         );
 
     font-size: 11px;
-
     font-weight: 900;
 
     white-space: nowrap;
@@ -773,7 +721,7 @@ p {
 
 
 /* ================================================= */
-/* 하단 내 영역 + 행동 */
+/* 하단 */
 /* ================================================= */
 
 .game-controls {
@@ -782,14 +730,8 @@ p {
     display: grid;
 
     grid-template-columns:
-        minmax(
-            300px,
-            .85fr
-        )
-        minmax(
-            380px,
-            1.15fr
-        );
+        minmax(300px, .85fr)
+        minmax(380px, 1.15fr);
 
     gap: 10px;
 
@@ -799,8 +741,6 @@ p {
 .my-panel,
 .control-panel {
     min-height: 0;
-
-    overflow: hidden;
 }
 
 .my-panel {
@@ -822,22 +762,16 @@ p {
     grid-template-columns:
         repeat(
             4,
-            minmax(
-                0,
-                1fr
-            )
+            1fr
         );
 
     gap: 7px;
 }
 
 .action-grid button {
-    width: 100%;
-
     min-height: 62px;
 
-    padding:
-        8px 6px;
+    padding: 8px;
 
     font-size: 12px;
 
@@ -846,12 +780,8 @@ p {
 
 
 /* ================================================= */
-/* 대상 선택 */
+/* 대상 */
 /* ================================================= */
-
-#target-area {
-    min-height: 0;
-}
 
 .target-list {
     display: grid;
@@ -859,17 +789,10 @@ p {
     grid-template-columns:
         repeat(
             2,
-            minmax(
-                0,
-                1fr
-            )
+            1fr
         );
 
     gap: 8px;
-}
-
-.target-list button {
-    min-width: 0;
 }
 
 
@@ -906,7 +829,6 @@ p {
 }
 
 .timer-bar {
-    width: 100%;
     height: 6px;
 
     background: #27272a;
@@ -965,10 +887,7 @@ p {
     grid-template-columns:
         repeat(
             4,
-            minmax(
-                0,
-                1fr
-            )
+            1fr
         );
 
     gap: 8px;
@@ -985,8 +904,7 @@ p {
 
     padding: 5px;
 
-    transition:
-        .18s ease;
+    transition: .18s ease;
 }
 
 .exchange-choice img {
@@ -997,8 +915,6 @@ p {
     object-fit: contain;
 
     border-radius: 6px;
-
-    display: block;
 }
 
 .exchange-choice span {
@@ -1007,15 +923,7 @@ p {
     margin-top: 5px;
 
     font-size: 11px;
-
     font-weight: 900;
-}
-
-.exchange-choice:hover {
-    border-color: #06b6d4;
-
-    transform:
-        translateY(-3px);
 }
 
 .exchange-choice.selected {
@@ -1031,13 +939,12 @@ p {
         );
 
     transform:
-        translateY(-3px)
-        scale(1.02);
+        translateY(-3px);
 }
 
 
 /* ================================================= */
-/* 로그 */
+/* 기록 */
 /* ================================================= */
 
 .history-panel {
@@ -1054,8 +961,6 @@ p {
 
 .history-list {
     flex: 1;
-
-    min-height: 0;
 
     overflow-y: auto;
 
@@ -1075,8 +980,7 @@ p {
 
     border-radius: 6px;
 
-    padding:
-        7px 8px;
+    padding: 7px 8px;
 
     font-size: 12px;
 
@@ -1117,7 +1021,7 @@ p {
 
 
 /* ================================================= */
-/* 코인 애니메이션 */
+/* 코인 FX */
 /* ================================================= */
 
 .coin-fx {
@@ -1128,17 +1032,6 @@ p {
     pointer-events: none;
 
     font-size: 25px;
-
-    filter:
-        drop-shadow(
-            0 3px 4px
-            rgba(
-                0,
-                0,
-                0,
-                .45
-            )
-        );
 }
 
 .amount-fx {
@@ -1153,15 +1046,11 @@ p {
     font-weight: 900;
 
     color: #fbbf24;
-
-    text-shadow:
-        0 2px 6px
-        black;
 }
 
 
 /* ================================================= */
-/* 도전 / 사망 시네마틱 */
+/* 시네마틱 */
 /* ================================================= */
 
 .cinematic-overlay {
@@ -1185,8 +1074,7 @@ p {
             .86
         );
 
-    backdrop-filter:
-        blur(6px);
+    backdrop-filter: blur(6px);
 
     opacity: 0;
 
@@ -1200,7 +1088,6 @@ p {
 
 .cinematic-overlay.show {
     opacity: 1;
-
     visibility: visible;
 }
 
@@ -1215,20 +1102,17 @@ p {
 
     text-align: center;
 
-    transform:
-        scale(.82);
+    transform: scale(.82);
 
     opacity: 0;
 
     transition:
-        transform .28s ease,
-        opacity .28s ease;
+        .28s ease;
 }
 
 .cinematic-overlay.show
 .cinematic-content {
     transform: scale(1);
-
     opacity: 1;
 }
 
@@ -1238,8 +1122,6 @@ p {
     font-weight: 1000;
 
     margin-bottom: 14px;
-
-    letter-spacing: 2px;
 }
 
 .cinematic-subtitle {
@@ -1255,8 +1137,7 @@ p {
 .cinematic-card {
     width: 190px;
 
-    aspect-ratio:
-        2 / 3;
+    aspect-ratio: 2 / 3;
 
     margin:
         0 auto 17px;
@@ -1267,24 +1148,9 @@ p {
 
     position: relative;
 
-    box-shadow:
-        0 18px 55px
-        rgba(
-            0,
-            0,
-            0,
-            .8
-        );
-
     animation:
         cinematicCardIn
-        .55s
-        cubic-bezier(
-            .2,
-            .85,
-            .25,
-            1
-        );
+        .55s ease;
 }
 
 .cinematic-card img {
@@ -1309,19 +1175,15 @@ p {
 
     display: flex;
 
-    align-items: center;
-
     justify-content: center;
+
+    align-items: center;
 
     color: #ef4444;
 
     font-size: 45px;
 
     font-weight: 1000;
-
-    text-shadow:
-        0 3px 8px
-        black;
 
     transform:
         rotate(-12deg);
@@ -1344,18 +1206,11 @@ p {
 .cinematic-card.death {
     animation:
         deathCard
-        1.15s
-        ease
-        forwards;
+        1.15s ease forwards;
 }
 
 .death-title {
     color: #ef4444;
-
-    animation:
-        deathText
-        .7s
-        ease;
 }
 
 .eliminated-title {
@@ -1366,11 +1221,6 @@ p {
     font-weight: 1000;
 
     margin-top: 14px;
-
-    animation:
-        deathText
-        .7s
-        ease;
 }
 
 .cinematic-overlay.red-flash::before {
@@ -1390,14 +1240,9 @@ p {
 
     animation:
         redFlash
-        .45s
-        ease;
+        .45s ease;
 }
 
-
-/* ================================================= */
-/* 시네마틱 애니메이션 */
-/* ================================================= */
 
 @keyframes cinematicCardIn {
 
@@ -1424,12 +1269,7 @@ p {
 @keyframes deathCard {
 
     0% {
-        transform:
-            scale(1)
-            rotate(0);
-
-        filter:
-            brightness(1);
+        transform: scale(1);
     }
 
     20% {
@@ -1470,24 +1310,6 @@ p {
 }
 
 
-@keyframes deathText {
-
-    from {
-        transform:
-            scale(2.2);
-
-        opacity: 0;
-    }
-
-    to {
-        transform:
-            scale(1);
-
-        opacity: 1;
-    }
-}
-
-
 @keyframes redFlash {
 
     0% {
@@ -1523,11 +1345,9 @@ p {
     #game-screen {
         height: auto;
 
-        grid-template-columns:
-            1fr;
+        grid-template-columns: 1fr;
 
-        grid-template-rows:
-            auto;
+        grid-template-rows: auto;
 
         grid-template-areas:
             "status"
@@ -1539,10 +1359,7 @@ p {
     }
 
     .game-controls {
-        grid-template-columns:
-            1fr;
-
-        min-height: 0;
+        grid-template-columns: 1fr;
     }
 
     .history-panel {
@@ -1602,7 +1419,7 @@ p {
             id="room-list"
             class="muted"
         >
-            현재 방이 없습니다.
+            현재 공개된 방이 없습니다.
         </div>
 
     </div>
@@ -1659,9 +1476,8 @@ p {
 
         </p>
 
-        <ul
-            id="waiting-list"
-        ></ul>
+        <ul id="waiting-list"></ul>
+
 
         <div class="row">
 
@@ -1672,10 +1488,19 @@ p {
                 🤖 AI 추가
             </button>
 
+
             <button
                 onclick="startGame()"
             >
                 ⚔️ 게임 시작
+            </button>
+
+
+            <button
+                class="gray"
+                onclick="leaveGame()"
+            >
+                🚪 나가기
             </button>
 
         </div>
@@ -1691,6 +1516,7 @@ p {
 
 <div id="game-screen">
 
+
     <!-- 상단 -->
     <div
         class="
@@ -1705,6 +1531,7 @@ p {
                 게임 준비 중...
             </div>
 
+
             <div class="board-center">
 
                 <div id="deck-pile">
@@ -1714,6 +1541,13 @@ p {
                 <div id="bank">
                     🪙 BANK
                 </div>
+
+                <button
+                    class="gray"
+                    onclick="leaveGame()"
+                >
+                    🚪 나가기
+                </button>
 
             </div>
 
@@ -1739,7 +1573,7 @@ p {
     </div>
 
 
-    <!-- 내 카드 + 조작 -->
+    <!-- 하단 -->
     <div class="game-controls">
 
         <div
@@ -1857,7 +1691,7 @@ p {
     </div>
 
 
-    <!-- 로그 -->
+    <!-- 기록 -->
     <div
         class="
             history-panel
@@ -1885,7 +1719,7 @@ p {
 
 
 <!-- ================================================= -->
-<!-- 연출창 -->
+<!-- 시네마틱 -->
 <!-- ================================================= -->
 
 <div
@@ -1909,7 +1743,7 @@ const socket =
 
 
 // =====================================================
-// 카드 이미지
+// 이미지
 // =====================================================
 
 const ROLE_IMAGES = {
@@ -1938,16 +1772,16 @@ const ROLE_IMAGES = {
 const ROLE_TOOLTIPS = {
 
     '공작':
-        '공작 · 세금 징수로 코인 3개 획득 · 다른 플레이어의 외부 지원을 차단할 수 있습니다.',
+        '공작 · 세금으로 코인 3개 획득 · 외부 지원을 차단할 수 있습니다.',
 
     '암살자':
         '암살자 · 코인 3개를 지불하고 상대의 영향력 1개를 제거합니다.',
 
     '사령관':
-        '사령관 · 상대에게서 최대 2코인을 약탈 · 사령관의 약탈을 방어할 수 있습니다.',
+        '사령관 · 상대에게서 최대 2코인을 약탈 · 약탈을 방어할 수 있습니다.',
 
     '외교관':
-        '외교관 · 덱에서 새 카드 2장을 보고 원하는 카드로 교환 · 사령관의 약탈을 방어할 수 있습니다.',
+        '외교관 · 덱에서 새 카드 2장을 보고 원하는 카드를 선택 · 약탈을 방어할 수 있습니다.',
 
     '귀부인':
         '귀부인 · 암살자의 암살을 차단할 수 있습니다.'
@@ -1995,7 +1829,7 @@ const TARGET_ACTIONS =
 
 
 // =====================================================
-// 화면 전환
+// 화면
 // =====================================================
 
 function show(name) {
@@ -2093,7 +1927,6 @@ function joinRoom(code) {
         'join_room',
 
         {
-
             roomCode:
                 currentRoom,
 
@@ -2130,6 +1963,43 @@ function startGame() {
 
     socket.emit(
         'start_game',
+        currentRoom
+    );
+}
+
+
+// =====================================================
+// 나가기
+// =====================================================
+
+function leaveGame() {
+
+    if (
+        !currentRoom
+    ) {
+
+        return;
+    }
+
+
+    const yes =
+        confirm(
+            '게임방에서 나가시겠습니까?'
+        );
+
+
+    if (
+        !yes
+    ) {
+
+        return;
+    }
+
+
+    socket.emit(
+
+        'leave_room',
+
         currentRoom
     );
 }
@@ -2191,27 +2061,159 @@ socket.on(
 
 
 // =====================================================
-// 시각 연출 이벤트
+// 나가기 완료
 // =====================================================
 
 socket.on(
 
-    'visual_event',
+    'left_room',
 
-    event => {
+    () => {
 
-        visualQueue.push(
-            event
+        currentRoom =
+            '';
+
+
+        state =
+            null;
+
+
+        targetAction =
+            null;
+
+
+        exchangeSelection =
+            new Set();
+
+
+        hasPlayedDealAnimation =
+            false;
+
+
+        visualQueue =
+            [];
+
+
+        visualPlaying =
+            false;
+
+
+        clearInterval(
+            challengeInterval
         );
 
 
-        runVisualQueue();
+        challengeInterval =
+            null;
+
+
+        const overlay =
+
+            document
+                .getElementById(
+                    'cinematic-overlay'
+                );
+
+
+        overlay
+            ?.classList
+            .remove(
+                'show'
+            );
+
+
+        show(
+            'lobby'
+        );
+
+
+        socket.emit(
+            'request_lobby'
+        );
     }
 );
 
 
 // =====================================================
-// 로비 업데이트
+// 시각 이벤트
+// =====================================================
+
+socket.on(
+    'visual_event',
+
+    event => {
+
+        // 다른 탭 보고 있는 중이면
+        // 오래된 연출을 쌓지 않음
+        if (
+            document.visibilityState !==
+            'visible'
+        ) {
+
+            return;
+        }
+
+
+        visualQueue.push(
+            event
+        );
+
+        runVisualQueue();
+    }
+);
+// =====================================================
+// 탭 전환 시 시네마틱 꼬임 방지
+// =====================================================
+
+document.addEventListener(
+    'visibilitychange',
+    () => {
+
+        // 다시 화면으로 돌아왔을 때
+        if (
+            document.visibilityState ===
+            'visible'
+        ) {
+
+            const overlay =
+                document.getElementById(
+                    'cinematic-overlay'
+                );
+
+            overlay
+                ?.classList
+                .remove(
+                    'show',
+                    'red-flash'
+                );
+
+
+            const content =
+                document.getElementById(
+                    'cinematic-content'
+                );
+
+            if (
+                content
+            ) {
+
+                content.innerHTML =
+                    '';
+            }
+
+
+            // 이전 탭에서 밀린 연출 폐기
+            visualQueue =
+                [];
+
+            visualPlaying =
+                false;
+        }
+    }
+);
+
+// =====================================================
+// 로비
 // =====================================================
 
 socket.on(
@@ -2229,7 +2231,6 @@ socket.on(
 
 
         const entries =
-
             Object.entries(
                 rooms
             );
@@ -2304,6 +2305,7 @@ socket.on(
                                     </span>
 
                                 </div>
+
 
                                 <button
 
@@ -2397,6 +2399,11 @@ function renderWaiting(
 
             data.players
 
+                .filter(
+                    player =>
+                        !player.disconnected
+                )
+
                 .map(
 
                     player => `
@@ -2456,7 +2463,6 @@ socket.on(
             () => {
 
                 if (
-
                     !hasPlayedDealAnimation
 
                     &&
@@ -2502,10 +2508,7 @@ socket.on(
 
 function renderGame() {
 
-    if (
-        !state
-    ) {
-
+    if (!state) {
         return;
     }
 
@@ -2625,16 +2628,13 @@ function renderGame() {
         state.prompt;
 
 
-    if (
-        !prompt
-    ) {
-
+    if (!prompt) {
         return;
     }
 
 
     // =================================================
-    // 내 턴
+    // 행동
     // =================================================
 
     if (
@@ -2691,13 +2691,9 @@ function renderGame() {
 
         showPrompt(`
 
-            <div
-                class="challenge-box"
-            >
+            <div class="challenge-box">
 
-                <div
-                    class="challenge-timer"
-                >
+                <div class="challenge-timer">
 
                     <span
                         id="challenge-countdown"
@@ -2710,9 +2706,7 @@ function renderGame() {
                 </div>
 
 
-                <div
-                    class="timer-bar"
-                >
+                <div class="timer-bar">
 
                     <div
                         id="challenge-fill"
@@ -2823,13 +2817,9 @@ function renderGame() {
 
         showPrompt(`
 
-            <div
-                class="defense-box"
-            >
+            <div class="defense-box">
 
-                <div
-                    class="challenge-timer"
-                >
+                <div class="challenge-timer">
 
                     <span
                         id="challenge-countdown"
@@ -2842,9 +2832,7 @@ function renderGame() {
                 </div>
 
 
-                <div
-                    class="timer-bar"
-                >
+                <div class="timer-bar">
 
                     <div
                         id="challenge-fill"
@@ -2857,7 +2845,6 @@ function renderGame() {
                 <h3>
 
                     🛡️
-
                     ${escapeHtml(
                         prompt.title
                     )}
@@ -2877,6 +2864,7 @@ function renderGame() {
                 <div class="row">
 
                     ${buttons}
+
 
                     <button
 
@@ -2929,13 +2917,9 @@ function renderGame() {
 
                         <button
 
-                            class="
-                                exchange-choice
-                            "
+                            class="exchange-choice"
 
-                            id="
-                                exchange-${candidate.id}
-                            "
+                            id="exchange-${candidate.id}"
 
                             onclick="
                                 toggleExchangeCard(
@@ -2946,16 +2930,8 @@ function renderGame() {
                         >
 
                             <img
-
-                                src="
-                                    ${ROLE_IMAGES[
-                                        candidate.role
-                                    ]}
-                                "
-
-                                draggable="
-                                    false
-                                "
+                                src="${ROLE_IMAGES[candidate.role]}"
+                                draggable="false"
                             >
 
                             <span>
@@ -2979,7 +2955,6 @@ function renderGame() {
                 🔄 외교관 카드 교환
             </h3>
 
-
             <p>
 
                 아래 카드 중
@@ -2993,9 +2968,7 @@ function renderGame() {
             </p>
 
 
-            <div
-                class="exchange-grid"
-            >
+            <div class="exchange-grid">
 
                 ${cards}
 
@@ -3094,7 +3067,9 @@ function renderGame() {
             </p>
 
             <p class="muted">
+
                 공개할 카드를 선택하세요.
+
             </p>
 
             <div class="row">
@@ -3131,13 +3106,39 @@ function renderGame() {
                 승리!
 
             </h2>
+
+
+            <p class="muted">
+
+                게임이 종료되었습니다.
+
+            </p>
+
+
+            <button
+
+                class="green"
+
+                style="
+                    width:100%;
+                    margin-top:10px;
+                "
+
+                onclick="
+                    leaveGame()
+                "
+            >
+
+                🚪 로비로 나가기
+
+            </button>
         `);
     }
 }
 
 
 // =====================================================
-// 플레이어 카드 렌더
+// 플레이어 표시
 // =====================================================
 
 function playerHtml(
@@ -3169,15 +3170,11 @@ function playerHtml(
                                     hidden
                                 "
 
-                                data-card-index="
-                                    ${index}
-                                "
+                                data-card-index="${index}"
 
-                                data-owner-id="
-                                    ${escapeHtml(
-                                        player.id
-                                    )}
-                                "
+                                data-owner-id="${escapeHtml(
+                                    player.id
+                                )}"
                             >
                             </div>
                         `;
@@ -3185,7 +3182,6 @@ function playerHtml(
 
 
                     const image =
-
                         ROLE_IMAGES[
                             card.role
                         ];
@@ -3217,38 +3213,26 @@ function playerHtml(
                                 }
                             "
 
-                            data-card-index="
-                                ${index}
-                            "
+                            data-card-index="${index}"
 
-                            data-owner-id="
-                                ${escapeHtml(
-                                    player.id
-                                )}
-                            "
+                            data-owner-id="${escapeHtml(
+                                player.id
+                            )}"
 
-                            data-tooltip="
-                                ${escapeHtml(
-                                    tooltip
-                                )}
-                            "
+                            data-tooltip="${escapeHtml(
+                                tooltip
+                            )}"
                         >
 
                             <img
 
-                                src="
-                                    ${image}
-                                "
+                                src="${image}"
 
-                                alt="
-                                    ${escapeHtml(
-                                        card.role
-                                    )}
-                                "
+                                alt="${escapeHtml(
+                                    card.role
+                                )}"
 
-                                draggable="
-                                    false
-                                "
+                                draggable="false"
                             >
 
                         </div>
@@ -3274,6 +3258,15 @@ function playerHtml(
             : '';
 
 
+    const disconnectClass =
+
+        player.disconnected
+
+            ? 'disconnected'
+
+            : '';
+
+
     return `
 
         <div
@@ -3281,6 +3274,7 @@ function playerHtml(
             class="
                 player
                 ${turnClass}
+                ${disconnectClass}
 
                 ${
                     isMe
@@ -3291,11 +3285,9 @@ function playerHtml(
                 }
             "
 
-            id="
-                player-${escapeHtml(
-                    player.id
-                )}
-            "
+            id="player-${escapeHtml(
+                player.id
+            )}"
         >
 
             <div class="head">
@@ -3308,17 +3300,19 @@ function playerHtml(
 
                     ${
                         player.isAI
-
                             ? ' 🤖'
+                            : ''
+                    }
 
+                    ${
+                        player.disconnected
+                            ? ' 🚪'
                             : ''
                     }
 
                     ${
                         isMe
-
                             ? ' (나)'
-
                             : ''
                     }
 
@@ -3347,7 +3341,7 @@ function playerHtml(
 
 
 // =====================================================
-// 행동 선택
+// 행동
 // =====================================================
 
 function chooseAction(
@@ -3384,6 +3378,10 @@ function chooseAction(
                     &&
 
                     player.alive
+
+                    &&
+
+                    !player.disconnected
             );
 
 
@@ -3439,11 +3437,11 @@ function chooseAction(
                 🎯 대상 선택
             </h3>
 
-            <div
-                class="target-list"
-            >
+
+            <div class="target-list">
 
                 ${buttons}
+
 
                 <button
 
@@ -3469,7 +3467,6 @@ function chooseAction(
         'declare_action',
 
         {
-
             roomCode:
                 currentRoom,
 
@@ -3480,7 +3477,7 @@ function chooseAction(
 
 
 // =====================================================
-// 대상 선택
+// 대상
 // =====================================================
 
 function sendTarget(
@@ -3492,7 +3489,6 @@ function sendTarget(
         'declare_action',
 
         {
-
             roomCode:
                 currentRoom,
 
@@ -3556,7 +3552,6 @@ function challenge(
         'challenge_response',
 
         {
-
             roomCode:
                 currentRoom,
 
@@ -3584,7 +3579,6 @@ function respondBlock(
         'block_response',
 
         {
-
             roomCode:
                 currentRoom,
 
@@ -3612,7 +3606,6 @@ function loseCard(
         'lose_card',
 
         {
-
             roomCode:
                 currentRoom,
 
@@ -3627,7 +3620,7 @@ function loseCard(
 
 
 // =====================================================
-// 외교관 교환
+// 외교관
 // =====================================================
 
 function toggleExchangeCard(
@@ -3713,7 +3706,6 @@ function submitExchange(
         'exchange_choice',
 
         {
-
             roomCode:
                 currentRoom,
 
@@ -3757,13 +3749,11 @@ function showPrompt(
 function disablePrompt() {
 
     document
-
         .querySelectorAll(
             '#prompt-area button'
         )
 
         .forEach(
-
             button => {
 
                 button.disabled =
@@ -3784,11 +3774,8 @@ function startChallengeCountdown(
     const total =
 
         Math.max(
-
             1,
-
-            deadline -
-            Date.now()
+            deadline - Date.now()
         );
 
 
@@ -3797,11 +3784,8 @@ function startChallengeCountdown(
         const left =
 
             Math.max(
-
                 0,
-
-                deadline -
-                Date.now()
+                deadline - Date.now()
             );
 
 
@@ -3830,11 +3814,7 @@ function startChallengeCountdown(
                 (
                     left /
                     1000
-                )
-
-                    .toFixed(
-                        1
-                    );
+                ).toFixed(1);
         }
 
 
@@ -3850,9 +3830,7 @@ function startChallengeCountdown(
 
                         Math.min(
                             1,
-
-                            left /
-                            total
+                            left / total
                         )
                     )
                 })`;
@@ -3890,7 +3868,7 @@ function startChallengeCountdown(
 
 
 // =====================================================
-// 로그 렌더
+// 로그
 // =====================================================
 
 function renderHistory(
@@ -3935,7 +3913,6 @@ function renderHistory(
                                 'ko-KR',
 
                                 {
-
                                     hour:
                                         '2-digit',
 
@@ -3962,9 +3939,7 @@ function renderHistory(
                         >
 
                             <span
-                                class="
-                                    history-time
-                                "
+                                class="history-time"
                             >
 
                                 ${time}
@@ -4083,13 +4058,11 @@ function animateDeal() {
                 ],
 
                 {
-
                     duration:
                         520,
 
                     delay:
-                        index *
-                        130,
+                        index * 130,
 
                     easing:
                         'cubic-bezier(.2,.8,.2,1)',
@@ -4104,7 +4077,7 @@ function animateDeal() {
 
 
 // =====================================================
-// 코인 변화 감지
+// 코인 변화
 // =====================================================
 
 function animateCoinChanges(
@@ -4128,10 +4101,7 @@ function animateCoinChanges(
             );
 
 
-        if (
-            !oldPlayer
-        ) {
-
+        if (!oldPlayer) {
             continue;
         }
 
@@ -4218,25 +4188,21 @@ function animateCoins(
 
 
     const startX =
-
         startRect.left +
         startRect.width / 2;
 
 
     const startY =
-
         startRect.top +
         startRect.height / 2;
 
 
     const endX =
-
         endRect.left +
         endRect.width / 2;
 
 
     const endY =
-
         endRect.top +
         endRect.height / 2;
 
@@ -4244,11 +4210,7 @@ function animateCoins(
     const count =
 
         Math.min(
-
-            Math.abs(
-                delta
-            ),
-
+            Math.abs(delta),
             4
         );
 
@@ -4297,31 +4259,22 @@ function animateCoins(
 
                     {
                         transform:
-                            'translate(0,0) scale(1)',
+                            'translate(0,0)',
 
-                        opacity:
-                            1
+                        opacity: 1
                     },
 
                     {
                         transform:
-                            `translate(${endX - startX}px, ${endY - startY}px) scale(.7)`,
+                            `translate(${endX - startX}px, ${endY - startY}px)`,
 
-                        opacity:
-                            .3
+                        opacity: .3
                     }
                 ],
 
                 {
-
-                    duration:
-                        650,
-
-                    delay:
-                        i * 90,
-
-                    easing:
-                        'cubic-bezier(.25,.8,.25,1)'
+                    duration: 650,
+                    delay: i * 90
                 }
             );
 
@@ -4367,7 +4320,7 @@ function animateCoins(
         );
 
 
-    const anim =
+    const animation =
 
         badge.animate(
 
@@ -4377,38 +4330,33 @@ function animateCoins(
                     transform:
                         'translateY(10px)',
 
-                    opacity:
-                        0
+                    opacity: 0
                 },
 
                 {
                     transform:
                         'translateY(0)',
 
-                    opacity:
-                        1,
+                    opacity: 1,
 
-                    offset:
-                        .25
+                    offset: .25
                 },
 
                 {
                     transform:
                         'translateY(-25px)',
 
-                    opacity:
-                        0
+                    opacity: 0
                 }
             ],
 
             {
-                duration:
-                    900
+                duration: 900
             }
         );
 
 
-    anim.onfinish =
+    animation.onfinish =
         () =>
             badge.remove();
 }
@@ -4433,16 +4381,13 @@ function animateRevealedCards(
 
             previous.players.find(
 
-                oldPlayer =>
-                    oldPlayer.id ===
+                previousPlayer =>
+                    previousPlayer.id ===
                     player.id
             );
 
 
-        if (
-            !old
-        ) {
-
+        if (!old) {
             continue;
         }
 
@@ -4487,20 +4432,11 @@ function animateRevealedCards(
                 const element =
 
                     owner?.querySelector(
-
                         `[data-card-index="${index}"]`
                     );
 
 
-                if (
-                    !element
-                ) {
-
-                    return;
-                }
-
-
-                element.animate(
+                element?.animate(
 
                     [
 
@@ -4521,8 +4457,7 @@ function animateRevealedCards(
                     ],
 
                     {
-                        duration:
-                            520
+                        duration: 520
                     }
                 );
             }
@@ -4532,7 +4467,7 @@ function animateRevealedCards(
 
 
 // =====================================================
-// 연출 큐
+// 시네마틱 큐
 // =====================================================
 
 async function runVisualQueue() {
@@ -4596,10 +4531,6 @@ async function runVisualQueue() {
 }
 
 
-// =====================================================
-// 시네마틱 열기
-// =====================================================
-
 function openCinematic(
     html,
     redFlash = false
@@ -4613,16 +4544,12 @@ function openCinematic(
             );
 
 
-    const content =
-
-        document
-            .getElementById(
-                'cinematic-content'
-            );
-
-
-    content.innerHTML =
-        html;
+    document
+        .getElementById(
+            'cinematic-content'
+        )
+        .innerHTML =
+            html;
 
 
     overlay.classList.toggle(
@@ -4632,7 +4559,6 @@ function openCinematic(
 
 
     requestAnimationFrame(
-
         () => {
 
             overlay.classList.add(
@@ -4643,14 +4569,9 @@ function openCinematic(
 }
 
 
-// =====================================================
-// 시네마틱 닫기
-// =====================================================
-
 function closeCinematic() {
 
     return new Promise(
-
         resolve => {
 
             const overlay =
@@ -4667,7 +4588,6 @@ function closeCinematic() {
 
 
             setTimeout(
-
                 () => {
 
                     overlay.classList.remove(
@@ -4694,29 +4614,20 @@ function closeCinematic() {
 }
 
 
-// =====================================================
-// 대기
-// =====================================================
-
-function sleep(
-    ms
-) {
+function sleep(ms) {
 
     return new Promise(
-
-        resolve => {
-
+        resolve =>
             setTimeout(
                 resolve,
                 ms
-            );
-        }
+            )
     );
 }
 
 
 // =====================================================
-// 도전 결과 연출
+// 도전 연출
 // =====================================================
 
 async function playChallengeResult(
@@ -4724,7 +4635,6 @@ async function playChallengeResult(
 ) {
 
     const image =
-
         ROLE_IMAGES[
             event.role
         ];
@@ -4763,13 +4673,9 @@ async function playChallengeResult(
 
             님의
 
-            <b>
-
-                [${escapeHtml(
-                    event.role
-                )}]
-
-            </b>
+            [${escapeHtml(
+                event.role
+            )}]
 
             주장에 도전했습니다.
 
@@ -4780,12 +4686,9 @@ async function playChallengeResult(
 
             class="
                 cinematic-card
-
                 ${
                     event.truthful
-
                         ? ''
-
                         : 'false'
                 }
             "
@@ -4803,12 +4706,9 @@ async function playChallengeResult(
 
             class="
                 cinematic-result
-
                 ${
                     event.truthful
-
                         ? 'success'
-
                         : 'fail'
                 }
             "
@@ -4836,7 +4736,7 @@ async function playChallengeResult(
 
 
 // =====================================================
-// 영향력 상실 연출
+// 사망 연출
 // =====================================================
 
 async function playInfluenceLost(
@@ -4844,7 +4744,6 @@ async function playInfluenceLost(
 ) {
 
     const image =
-
         ROLE_IMAGES[
             event.role
         ];
@@ -4945,7 +4844,7 @@ async function playInfluenceLost(
 
 
 // =====================================================
-// HTML 안전 처리
+// HTML 안전
 // =====================================================
 
 function escapeHtml(
